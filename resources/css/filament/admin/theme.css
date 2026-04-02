@@ -1,0 +1,56 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+/* Sidebar */
+.fi-sidebar {
+    @apply bg-gradient-to-b from-blue-900 to-red-600 text-white;
+}
+
+.fi-sidebar-nav {
+    @apply ring-1 ring-white/10 bg-transparent;
+}
+
+/* Topbar */
+.fi-topbar {
+    @apply !bg-white dark:!bg-slate-900 border-b border-gray-200 dark:border-gray-700;
+}
+
+/* Logo fix for dark mode */
+.dark .fi-logo {
+    filter: brightness(1.2);
+}
+
+/* Buttons (Primary) */
+.fi-btn-primary {
+    @apply bg-red-600 hover:bg-red-700 border-none text-white;
+}
+
+/* Active menu item */
+.fi-sidebar-item-active {
+    @apply bg-white/10 border-l-4 border-red-500;
+}
+
+/* Hover effect */
+.fi-sidebar-item:hover {
+    @apply bg-white/10;
+}
+
+/* Card styling */
+.fi-card {
+    @apply rounded-xl shadow-md border border-gray-200 dark:border-gray-700;
+}
+
+/* Page background */
+.fi-main {
+    @apply bg-gray-50 dark:bg-slate-950;
+}
+
+.fi-btn-primary {
+    background: linear-gradient(to right, #1e3a8a, #e11d48);
+}
+
+.fi-logo {
+    filter: drop-shadow(0 0 6px rgba(225, 29, 72, 0.6));
+}
