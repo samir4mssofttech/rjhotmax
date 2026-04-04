@@ -15,6 +15,7 @@ class Employee extends Model
         'name',
         'email',
         'phone',
+        'branch_id',
         'join_date',
         'confirmation_date',
         'exit_date',
@@ -26,10 +27,10 @@ class Employee extends Model
     /**
      * A Member can have many Customers.
      */
-    // public function customers()
-    // {
-    //     return $this->hasMany(Customer::class);
-    // }
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     /**
      * A Member can have one User.

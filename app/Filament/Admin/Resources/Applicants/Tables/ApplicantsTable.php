@@ -17,6 +17,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
@@ -76,23 +77,11 @@ class ApplicantsTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                // ➕ ADD filters (alongside TrashedFilter):
-                // SelectFilter::make('status')
-                //     ->options(ApplicantStatus::class)
-                //     ->multiple(),
-
-                // SelectFilter::make('position')
-                //     ->label('Department')
-                //     ->options(Department::class)
-                //     ->multiple(),
-
-                // SelectFilter::make('employment_type')
-                //     ->options(EmploymentType::class),
                 //==================
                 TextColumn::make('apply_date')
                     ->date()
                     ->sortable(),
-                TextColumn::make('branch_name'),
+                TextColumn::make('branch.display_name')->badge(),
                 TextColumn::make('city')
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('state')
@@ -146,7 +135,7 @@ class ApplicantsTable
                         ->modalIconColor(ApplicantStatus::OFFERED->getColor())
                         ->modalDescription('Are you sure you\'d like to send the offer letter? This cannot be undone.')
                         ->fillForm(fn(Applicant $record): array => [
-                            'branch_name' => $record->branch_name,
+                            'branch_id' => $record->branch_id,
                             'city' => $record->city,
                             'state' => $record->state,
                             'location' => $record->location,
@@ -163,7 +152,11 @@ class ApplicantsTable
                                 ->schema([
                                     TextEntry::make('applicant_code'),
                                     TextEntry::make('applicant_name'),
-                                    TextInput::make('branch_name')
+                                    Select::make('branch_id')
+                                        ->relationship('branch', 'name')
+                                        ->getOptionLabelFromRecordUsing(fn($record) => $record->display_name)
+                                        ->searchable()
+                                        ->preload()
                                         ->required(),
                                     TextInput::make('city')
                                         ->required(),
@@ -182,7 +175,7 @@ class ApplicantsTable
                         ])
                         ->action(function (Applicant $record, array $data): void {
                             $record->update([
-                                'branch_name' => $data['branch_name'],
+                                'branch_id' => $data['branch_id'],
                                 'city' => $data['city'],
                                 'state' => $data['state'],
                                 'location' => $data['location'],
@@ -239,7 +232,7 @@ class ApplicantsTable
                         ->modalIconColor(ApplicantStatus::APPOINTMENT_LETTER_SENT->getColor())
                         ->modalDescription('Are you sure you\'d like to send the appointment letter? This cannot be undone.')
                         ->fillForm(fn(Applicant $record): array => [
-                            'branch_name' => $record->branch_name,
+                            'branch_id' => $record->branch_id,
                             'city' => $record->city,
                             'state' => $record->state,
                             'location' => $record->location,
@@ -256,7 +249,11 @@ class ApplicantsTable
                                 ->schema([
                                     TextEntry::make('applicant_code'),
                                     TextEntry::make('applicant_name'),
-                                    TextInput::make('branch_name')
+                                   Select::make('branch_id')
+                                        ->relationship('branch', 'name')
+                                        ->getOptionLabelFromRecordUsing(fn($record) => $record->display_name)
+                                        ->searchable()
+                                        ->preload()
                                         ->required(),
                                     TextInput::make('city')
                                         ->required(),
@@ -273,7 +270,7 @@ class ApplicantsTable
                                         ->helperText(fn(?string $state): ?string => $state !== null ? Str::ucwords(Number::spell((int) $state, 'en-IN')) : null),
                                     // ✅ ADD THIS
                                     FileUpload::make('appointment_letter')
-                                        ->label('Upload applicant`s Signed Appointment Letter')
+                                        ->label('Upload applicant`s Signed Offer Letter')
                                         ->disk('public')
                                         ->directory('appointment_letters')
                                         ->acceptedFileTypes(['application/pdf', 'image/*'])
@@ -301,8 +298,8 @@ class ApplicantsTable
                                     'phone' => $record->mobile_number,
                                     'join_date' => $data['date_of_joining'],
                                     'confirmation_date' => $record->confirmation_date, // set on acceptance
-                                    'exit_date' => null,    
-                                    'branch_name' => $data['branch_name'],
+                                    'exit_date' => null,
+                                    'branch_id' => $data['branch_id'],
                                     'status' => EmployeeStatus::ACTIVE,
                                 ]);
 

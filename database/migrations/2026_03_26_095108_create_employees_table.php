@@ -18,6 +18,11 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone')->nullable();
             $table->date('join_date')->nullable();
+
+            $table->foreignId('branch_id')
+                ->nullable()
+                ->constrained('branches')
+                ->nullOnDelete();
             $table->date('confirmation_date')->nullable();
             $table->date('exit_date')->nullable();
 

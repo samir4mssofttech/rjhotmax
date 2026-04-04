@@ -32,6 +32,10 @@ class EmployeesTable
                     ->label('Phone')
                     ->searchable(),
 
+                TextColumn::make('branch.display_name')
+                    ->label('Assigned Branch')
+                    ->badge(),
+
                 TextColumn::make('join_date')
                     ->label('Join Date')
                     ->date()

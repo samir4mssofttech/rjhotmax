@@ -6,6 +6,7 @@ use Filament\Actions\Action;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
@@ -99,6 +100,7 @@ class ApplicantInfolist
                         ->label('Reporting Manager')
                         ->icon('heroicon-m-user-circle')
                         ->placeholder('Not assigned'),
+
                 ]),
 
             // ── Emergency Contact ────────────────────────────────────
@@ -142,22 +144,30 @@ class ApplicantInfolist
                 ->icon('heroicon-m-map-pin')
                 ->columns(3)
                 ->schema([
-                    TextEntry::make('branch_name')
-                        ->label('Branch'),
+
                     TextEntry::make('city'),
                     TextEntry::make('state'),
-                    TextEntry::make('location')
-                        ->label('Specific Area'),
+
                     TextEntry::make('salary')
                         ->label('Monthly Salary')
                         ->money('INR')
                         ->weight(FontWeight::Bold)
                         ->size('Lg')
                         ->placeholder('Not set'),
+                    TextEntry::make('location')
+                        ->label('Specific Area')
+                        ->columnSpanFull(),
+                    TextEntry::make('branch.display_name')
+                        ->label('Assigned Branch')
+                        ->badge()
+                        ->color('primary') // Makes it stand out
+                        ->size('Lg') // Makes the text/badge larger
+                        ->weight(FontWeight::Bold)
+                        ->columnSpanFull(),
                 ]),
 
-            Section::make('Documents') 
-            ->icon(Heroicon::DocumentText)  
+            Section::make('Documents')
+                ->icon(Heroicon::DocumentText)
                 ->schema([
                     TextEntry::make('id_proof_type')
                         ->label('ID Proof Type')

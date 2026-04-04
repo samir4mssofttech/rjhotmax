@@ -25,7 +25,7 @@ class Applicant extends Model
         'aadhar_number',
         'pan_number',
         'apply_date',
-        'branch_name',
+        'branch_id',
         'city',
         'state',
         'location',
@@ -40,7 +40,7 @@ class Applicant extends Model
         'id_proof_type',
         'file_path',
         'appointment_letter_path',
-        
+
         // ADD to $fillable:
         'employment_type',        // Full-time / Contract / Intern
         'reporting_manager_id',   // FK to users table
@@ -87,4 +87,8 @@ class Applicant extends Model
         return $this->belongsTo(User::class, 'reporting_manager_id');
     }
 
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 }

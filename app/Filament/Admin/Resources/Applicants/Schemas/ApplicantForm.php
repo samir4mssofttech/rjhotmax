@@ -7,6 +7,7 @@ use App\Enums\Designation;
 use App\Enums\EmploymentType;
 use App\Enums\Gender;
 use App\Enums\UserRole;
+use App\Models\Branch;
 use App\Models\User;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\DatePicker;
@@ -211,7 +212,10 @@ class ApplicantForm
                                 Section::make('Location Details')
                                     ->icon('heroicon-m-map-pin')
                                     ->schema([
-                                        TextInput::make('branch_name')
+                                        Select::make('branch_id')
+                                            ->relationship('branch', 'name')
+                                            ->getOptionLabelFromRecordUsing(fn($record) => $record->display_name)
+                                            ->native(false)
                                             ->required(),
                                         TextInput::make('city')
                                             ->required(),

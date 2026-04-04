@@ -21,7 +21,9 @@ return new class extends Migration
             $table->string('gender');
             $table->date('date_of_birth');
             $table->date('apply_date');
-            $table->string('branch_name');
+            $table->foreignId('branch_id')
+                ->constrained('branches')
+                ->cascadeOnDelete();
             $table->string('city');
             $table->string('state');
             $table->string('location');
@@ -40,13 +42,13 @@ return new class extends Migration
             $table->string('id_proof_type')->nullable();
             $table->string('file_path')->nullable();
             $table->string('appointment_letter_path')->nullable();
-            
-             // ── ➕ Job Information ────────────────────────────────────
+
+            // ── ➕ Job Information ────────────────────────────────────
             $table->string('employment_type')->nullable();           // EmploymentType enum
             $table->foreignId('reporting_manager_id')
-                  ->nullable()
-                  ->constrained('users')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
 
             // ── ➕ Emergency Contact ──────────────────────────────────
             $table->string('emergency_contact_name')->nullable();
