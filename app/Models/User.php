@@ -18,7 +18,7 @@ use Mattiverse\Userstamps\Traits\Userstamps;
 
 class User extends Authenticatable implements HasName
 {
-    use HasFactory, Notifiable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes, Userstamps;
 
     protected $fillable = [
         'full_name',

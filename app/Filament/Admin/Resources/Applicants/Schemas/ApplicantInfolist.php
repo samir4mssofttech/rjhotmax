@@ -2,11 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Applicants\Schemas;
 
-use Filament\Actions\Action;
-use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Components\Actions;
-use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
@@ -201,15 +197,15 @@ class ApplicantInfolist
                 ->columns(2)
                 ->collapsed()
                 ->schema([
-                    // TextEntry::make('creator.full_name')
-                    //     ->label('Created By')
-                    //     ->icon('heroicon-m-user'),
+                    TextEntry::make('creator.full_name')
+                        ->label('Created By')
+                        ->icon('heroicon-m-user'),
                     TextEntry::make('created_at')
                         ->label('Created At')
                         ->dateTime('d M Y, h:i A'),
-                    // TextEntry::make('editor.full_name')
-                    //     ->label('Last Updated By')
-                    //     ->icon('heroicon-m-user'),
+                    TextEntry::make('editor.full_name')
+                        ->label('Last Updated By')
+                        ->icon('heroicon-m-user'),
                     TextEntry::make('updated_at')
                         ->label('Updated At')
                         ->dateTime('d M Y, h:i A'),
