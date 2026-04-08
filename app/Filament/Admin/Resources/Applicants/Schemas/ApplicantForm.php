@@ -7,16 +7,18 @@ use App\Enums\Designation;
 use App\Enums\EmploymentType;
 use App\Enums\Gender;
 use App\Enums\UserRole;
-use App\Models\Branch;
 use App\Models\User;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 
 class ApplicantForm
 {
@@ -189,11 +191,50 @@ class ApplicantForm
                                             ->native(false)
                                             ->required(),
                                         // ➕ ADD inside Application Status section:
-                                        Select::make('employment_type')
-                                            ->label('Employment Type')
-                                            ->options(EmploymentType::class)
-                                            ->native(false)
-                                            ->required(),
+                                        Section::make('Employment Details')
+                                            ->columns(1)
+                                            ->schema([
+                                                Radio::make('employment_type')
+                                                    ->label('Employment Type')
+                                                    ->inline()
+                                                    ->options(EmploymentType::class)
+                                                    ->default(EmploymentType::FULL_TIME)
+                                                    ->required()
+                                                    ->live() // Mandatory for reactivity
+                                                    ->afterStateUpdated(fn(Set $set) => $set('contract_start_date', null)),
+
+                                                // This should show up when "Contract" is selected
+                                                DatePicker::make('contract_start_date')
+                                                    ->label('Contract Start Date')
+                                                    ->native(false)
+                                                    ->required()
+                                                    ->visible(fn(Get $get) => $get('employment_type') === EmploymentType::CONTRACT),
+
+                                                DatePicker::make('contract_end_date')
+                                                    ->label('Contract End Date')
+                                                    ->native(false)
+                                                    ->required()
+                                                    ->visible(fn(Get $get) => $get('employment_type') === EmploymentType::CONTRACT),
+
+                                                TextInput::make('contract_terms')
+                                                    ->label('Contract Terms (Optional)')
+                                                    ->placeholder('e.g. Contract conditions')
+                                                    ->visible(fn(Get $get) => $get('employment_type') === EmploymentType::CONTRACT),
+
+
+
+                                                // This should show up when "Intern" is selected
+                                                DatePicker::make('internship_start_date')
+                                                    ->label('Internship Start Date')
+                                                    ->required()
+                                                    ->native(false)
+                                                    ->visible(fn(Get $get) => $get('employment_type') === EmploymentType::INTERN),
+                                                DatePicker::make('internship_end_date')
+                                                    ->label('Internship End Date')
+                                                    ->required()
+                                                    ->native(false)
+                                                    ->visible(fn(Get $get) => $get('employment_type') === EmploymentType::INTERN),
+                                            ]),
 
                                         Select::make('reporting_manager_id')
                                             ->label('Reporting Manager')

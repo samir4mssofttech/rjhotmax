@@ -62,9 +62,43 @@ class EmployeesTable
                         fn($state) =>
                         $state ? \Carbon\Carbon::parse($state)->format('d/m/Y') : null
                     ),
-                IconColumn::make('status')
-                    ->label('Status')
+                IconColumn::make('employee_status')
+                    ->tooltip(fn($record) => 'Employee is in ' . $record->employee_status->getLabel())
+                    ->label('Employee Status')
                     ->boolean(),
+                IconColumn::make('is_active')
+                    ->label('Is Verified')
+                    ->boolean(),
+
+                TextColumn::make('basic_salary')
+                    ->numeric()
+                    ->label('Basic Salary')
+                    ->money('INR', true)
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('hra')
+                    ->numeric()
+                    ->label('HRA')
+                    ->money('INR', true)
+                    ->placeholder('Not Assigned')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('conveyance')
+                    ->numeric()
+                    ->label('Conveyance')
+                    ->money('INR', true)
+                    ->placeholder('Not Assigned')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('medical')
+                    ->numeric()
+                    ->label('Medical')
+                    ->money('INR', true)
+                    ->placeholder('Not Assigned')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('other_allowances')
+                    ->numeric()
+                    ->label('Other Allowances')
+                    ->money('INR', true)
+                    ->placeholder('Not Assigned')
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('creator.full_name')
                     ->label('Created By')

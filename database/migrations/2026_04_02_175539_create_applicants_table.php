@@ -45,6 +45,14 @@ return new class extends Migration
 
             // ── ➕ Job Information ────────────────────────────────────
             $table->string('employment_type')->nullable();           // EmploymentType enum
+            $table->date('contract_start_date')->nullable();
+            $table->date('contract_end_date')->nullable();
+            $table->text('contract_terms')->nullable();
+
+            $table->date('internship_start_date')->nullable();
+            $table->date('internship_end_date')->nullable();
+
+
             $table->foreignId('reporting_manager_id')
                 ->nullable()
                 ->constrained('users')
@@ -53,7 +61,7 @@ return new class extends Migration
             // ── ➕ Emergency Contact ──────────────────────────────────
             $table->string('emergency_contact_name')->nullable();
             $table->string('emergency_contact_phone')->nullable();
-            $table->string('emergency_contact_relation')->nullable();
+            $table->string('emergency_contact_relation')->nullable(); 
 
             // ── ➕ Bank Details ───────────────────────────────────────
             $table->string('bank_account_number')->nullable();

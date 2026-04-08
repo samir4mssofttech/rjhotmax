@@ -16,16 +16,17 @@ return new class extends Migration
             $table->string('name');
             $table->string('code')->unique(); // e.g., BR-LON-001
             $table->string('location')->nullable();
-            // $table->string('email')->nullable();
-            // $table->string('phone')->nullable();
-            // $table->text('address')->nullable();
-
-            // If you have a specific Manager for the branch
-            // $table->foreignId('manager_id')->nullable()->constrained('users')->nullOnDelete();
 
             $table->boolean('is_active')->default(true);
-            $table->timestamps();
-            $table->softDeletes(); // Recommended for company records
+            // $table->timestamps();
+            // $table->softDeletes(); 
+
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
+            $table->softDeletes();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
         });
     }
 

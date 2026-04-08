@@ -85,6 +85,28 @@ class ApplicantInfolist
                             'intern'    => 'info',
                             default     => 'gray',
                         }),
+                    TextEntry::make('contract_start_date')
+                        ->label('Contract Start Date')
+                        ->date()
+                        ->visible(fn($record) => $record->employment_type?->value === 'contract'),
+
+                    TextEntry::make('contract_end_date')
+                        ->label('Contract End Date')
+                        ->date()
+                        ->visible(fn($record) => $record->employment_type?->value === 'contract'),
+
+                    TextEntry::make('contract_terms')
+                        ->visible(fn($record) => $record->employment_type?->value === 'contract'),
+
+                    TextEntry::make('internship_start_date')
+                        ->label('Internship Start Date')
+                        ->date()
+                        ->visible(fn($record) => $record->employment_type?->value === 'intern'),
+
+                    TextEntry::make('internship_end_date')
+                        ->label('Internship End Date')
+                        ->date()
+                        ->visible(fn($record) => $record->employment_type?->value === 'intern'),
                     TextEntry::make('apply_date')
                         ->label('Application Date')
                         ->date('d M Y'),

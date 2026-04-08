@@ -277,7 +277,6 @@ class ApplicantsTable
                                         ->maxSize(5120) // 5MB
                                         ->required()
                                         ->columnSpanFull(),
-
                                 ]),
                         ])
                         ->action(function (Applicant $record, array $data): void {
@@ -300,7 +299,8 @@ class ApplicantsTable
                                     'confirmation_date' => $record->confirmation_date, // set on acceptance
                                     'exit_date' => null,
                                     'branch_id' => $data['branch_id'],
-                                    'status' => EmployeeStatus::ACTIVE,
+                                    'is_active' => false, 
+                                    'employee_status' => EmployeeStatus::PROBATION,
                                 ]);
 
                                 // 3️⃣ Create User

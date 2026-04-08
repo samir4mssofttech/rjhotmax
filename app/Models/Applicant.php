@@ -44,6 +44,12 @@ class Applicant extends Model
 
         // ADD to $fillable:
         'employment_type',        // Full-time / Contract / Intern
+        'contract_start_date',
+        'contract_end_date',
+        'contract_terms',
+
+        'internship_start_date',
+        'internship_end_date',
         'reporting_manager_id',   // FK to users table
 
         // Emergency contact

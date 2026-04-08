@@ -20,10 +20,17 @@ class Employee extends Model
         'join_date',
         'confirmation_date',
         'exit_date',
-        'status',
+        'basic_salary',
+        'hra',
+        'conveyance',
+        'medical',
+        'other_allowances',
+        'employee_status',
+        'is_active',
     ];
     protected $casts = [
-        'status' => 'boolean',
+        'is_active' => 'boolean',
+        'employee_status' => EmployeeStatus::class,
     ];
     /**
      * A Member can have many Customers.
