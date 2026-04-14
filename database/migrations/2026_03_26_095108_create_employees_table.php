@@ -24,6 +24,8 @@ return new class extends Migration
                 ->constrained('branches')
                 ->nullOnDelete();
             $table->date('confirmation_date')->nullable();
+            $table->unsignedBigInteger('salary')->nullable()->comment('Stored in paisa (1₹ = 100)');
+            
             $table->date('exit_date')->nullable();
 
             $table->unsignedBigInteger('basic_salary')->nullable()->comment('Stored in paisa (1₹ = 100)');

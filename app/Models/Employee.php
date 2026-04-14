@@ -19,6 +19,7 @@ class Employee extends Model
         'branch_id',
         'join_date',
         'confirmation_date',
+        'salary',
         'exit_date',
         'basic_salary',
         'hra',

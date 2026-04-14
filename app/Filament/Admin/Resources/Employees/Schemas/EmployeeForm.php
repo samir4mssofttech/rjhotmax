@@ -9,6 +9,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
@@ -38,10 +39,15 @@ class EmployeeForm
                 DatePicker::make('join_date')
                     ->default(now())
                     ->required(),
+                TextInput::make('salary')
+                    ->numeric()
+                    ->label('Salary')
+                    ->prefix('₹'),
                 // 1. Make status "live" so it updates the form immediately
-                Radio::make('employee_status')
+                ToggleButtons::make('employee_status')
                     ->options(EmployeeStatus::class)
                     ->inline()
+                    ->grouped()
                     ->default(EmployeeStatus::ACTIVE) // Use Enum case if possible
                     ->required()
                     ->live(),
@@ -56,34 +62,39 @@ class EmployeeForm
                     ->inline(false),
                 TextInput::make('basic_salary')
                     ->numeric()
+                    ->prefix('₹')
                     ->label('Basic Salary')
                     ->visible(fn(Get $get) => $get('is_active')),
 
                 TextInput::make('hra')
                     ->numeric()
+                    ->prefix('₹')
                     ->label('HRA')
                     ->visible(fn(Get $get) => $get('is_active')),
 
                 TextInput::make('conveyance')
                     ->numeric()
+                    ->prefix('₹')
                     ->label('Conveyance')
                     ->visible(fn(Get $get) => $get('is_active')),
 
                 TextInput::make('medical')
                     ->numeric()
+                    ->prefix('₹')
                     ->label('Medical')
                     ->visible(fn(Get $get) => $get('is_active')),
 
                 TextInput::make('other_allowances')
                     ->numeric()
+                    ->prefix('₹')
                     ->label('Other Allowances')
                     ->visible(fn(Get $get) => $get('is_active')),
-                    
+
                 // 2. Add Exit Date - Visible only when status is EXIT
                 DatePicker::make('exit_date')
                     ->label('Date of Exit')
                     ->required()
-                    ->visible(fn(callable $get) => $get('status') === EmployeeStatus::EXIT)
+                    ->visible(fn(callable $get) => $get('employee_status') === EmployeeStatus::EXIT)
                     ->columns(2),
 
                 // 3. Add Exit Reason - Visible only when status is EXIT
@@ -91,7 +102,7 @@ class EmployeeForm
                     ->label('Reason for Exit / Termination')
                     ->placeholder('Enter details regarding the resignation or termination...')
                     ->required()
-                    ->visible(fn(callable $get) => $get('status') === EmployeeStatus::EXIT)
+                    ->visible(fn(callable $get) => $get('employee_status') === EmployeeStatus::EXIT)
                     ->columnSpanFull(),
             ]);
     }

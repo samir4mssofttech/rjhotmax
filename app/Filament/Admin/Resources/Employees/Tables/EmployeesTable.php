@@ -35,7 +35,10 @@ class EmployeesTable
                 TextColumn::make('branch.display_name')
                     ->label('Assigned Branch')
                     ->badge(),
-
+                TextColumn::make('salary')
+                    ->numeric()
+                    ->label('Salary')
+                    ->money('INR', true),
                 TextColumn::make('join_date')
                     ->label('Join Date')
                     ->date()

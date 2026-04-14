@@ -22,9 +22,11 @@ class ApplicantResource extends Resource
 {
     protected static ?string $model = Applicant::class;
 
-    protected static ?string $navigationLabel = 'Applicant Details';
+    protected static ?string $navigationLabel = 'Applicants';
 
     protected static string|UnitEnum|null $navigationGroup = NavigationGroup::HRMS;
+
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'applicant_name';
 
@@ -38,7 +40,8 @@ class ApplicantResource extends Resource
         return ApplicantForm::configure($schema);
     }
 
-    public static function infolist(Schema $schema):Schema {
+    public static function infolist(Schema $schema): Schema
+    {
         return ApplicantInfolist::configure($schema);
     }
     public static function table(Table $table): Table

@@ -296,6 +296,7 @@ class ApplicantsTable
                                     'email' => $record->email_id,
                                     'phone' => $record->mobile_number,
                                     'join_date' => $data['date_of_joining'],
+                                    'salary' => $data['salary'],
                                     'confirmation_date' => $record->confirmation_date, // set on acceptance
                                     'exit_date' => null,
                                     'branch_id' => $data['branch_id'],
