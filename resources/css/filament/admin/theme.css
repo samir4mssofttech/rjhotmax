@@ -1,35 +1,38 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 
-@source '../../../../app/Filament/**/*';
-@source '../../../../resources/views/filament/**/*';
+@source '../../../../app/Filament/Admin/**/*';
+@source '../../../../resources/views/filament/admin/**/*';
+
 
 /* Sidebar */
-.fi-sidebar {
-    @apply bg-gradient-to-b from-blue-900 to-red-600 text-white;
-}
+/* .fi-sidebar {
+    @apply bg-gradient-to-b from-indigo-800 via-indigo-400 to-slate-900 text-white;
+} */
 
-.fi-sidebar-nav {
-    @apply ring-1 ring-white/10 bg-transparent;
-}
 
 /* Topbar */
 .fi-topbar {
-    @apply !bg-white dark:!bg-slate-900 border-b border-gray-200 dark:border-gray-700;
+    @apply !bg-slate-300 dark:!bg-slate-700 border-b border-gray-200 dark:border-gray-800;
 }
 
-/* Logo fix for dark mode */
+/* Logo */
 .dark .fi-logo {
-    filter: brightness(1.2);
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
 }
 
 /* Buttons (Primary) */
 .fi-btn-primary {
-    @apply bg-red-600 hover:bg-red-700 border-none text-white;
+    @apply text-white border-none;
+    background: linear-gradient(to right, #4f46e5, #f43f5e); /* indigo → rose */
+}
+
+.fi-btn-primary:hover {
+    background: linear-gradient(to right, #4338ca, #e11d48);
 }
 
 /* Active menu item */
 .fi-sidebar-item-active {
-    @apply bg-white/10 border-l-4 border-red-500;
+    @apply bg-white/10 border-l-4 border-rose-500;
 }
 
 /* Hover effect */
@@ -39,18 +42,10 @@
 
 /* Card styling */
 .fi-card {
-    @apply rounded-xl shadow-md border border-gray-200 dark:border-gray-700;
+    @apply rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 bg-white dark:bg-slate-900;
 }
 
 /* Page background */
 .fi-main {
     @apply bg-gray-50 dark:bg-slate-950;
-}
-
-.fi-btn-primary {
-    background: linear-gradient(to right, #1e3a8a, #e11d48);
-}
-
-.fi-logo {
-    filter: drop-shadow(0 0 6px rgba(225, 29, 72, 0.6));
 }

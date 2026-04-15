@@ -67,9 +67,9 @@ class AdminPanelProvider extends PanelProvider
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->globalSearchFieldKeyBindingSuffix()
             ->sidebarCollapsibleOnDesktop()
-            ->brandLogo(asset('images/logo.png'))
+            ->brandLogo(asset('images/rjlogo.png'))
             ->brandLogoHeight('3rem')
-            ->favicon(asset('images/logo.png'))
+            ->favicon(asset('images/rjlogo.png'))
             ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }
