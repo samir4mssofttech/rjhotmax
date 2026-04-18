@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Mattiverse\Userstamps\Traits\Userstamps;
 
@@ -32,4 +33,9 @@ class Branch extends Model
     {
         return $this->hasMany(Applicant::class);
     }
+
+//     public function users(): BelongsToMany
+// {
+//     return $this->belongsToMany(User::class);
+// }
 }

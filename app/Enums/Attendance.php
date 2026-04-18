@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Enums;
+use BackedEnum;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
@@ -10,26 +11,32 @@ enum Attendance: string implements HasColor, HasIcon, HasLabel
 {
     case PRESENT = 'present';
     case ABSENT = 'absent';
-    case LATE = 'late';
-    case HALF_DAY = 'half-day';
+    case HALF_DAY   = 'half_day';
+    case ON_LEAVE   = 'on_leave';
+    case HOLIDAY    = 'holiday';
+    case WEEKLY_OFF = 'weekly_off';
 
     public function getColor(): string
     {
         return match ($this) {
             self::PRESENT => 'success',
             self::ABSENT => 'danger',
-            self::LATE => 'warning',
             self::HALF_DAY => 'primary',
+            self::ON_LEAVE => 'warning',
+            self::HOLIDAY => 'info',
+            self::WEEKLY_OFF => 'secondary',
         };
     }
 
-    public function getIcon(): string
+    public function getIcon(): BackedEnum
     {
         return match ($this) {
             self::PRESENT => Heroicon::Check,
             self::ABSENT => Heroicon::XMark,
-            self::LATE => Heroicon::Clock,
-            self::HALF_DAY => 'heroicon-o-adjustments',
+            self::HALF_DAY => Heroicon::Clock,
+            self::ON_LEAVE => Heroicon::Briefcase,
+            self::HOLIDAY => Heroicon::Sparkles,
+            self::WEEKLY_OFF => Heroicon::Calendar,
         };
     }
 
@@ -38,8 +45,10 @@ enum Attendance: string implements HasColor, HasIcon, HasLabel
         return match ($this) {
             self::PRESENT => 'Present',
             self::ABSENT => 'Absent',
-            self::LATE => 'Late',
             self::HALF_DAY => 'Half Day',
+            self::ON_LEAVE => 'On Leave',
+            self::HOLIDAY => 'Holiday',
+            self::WEEKLY_OFF => 'Weekly Off',
         };
     }
 }

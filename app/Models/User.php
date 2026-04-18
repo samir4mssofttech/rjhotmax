@@ -10,10 +10,15 @@ use App\Enums\Gender;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
 use Filament\Models\Contracts\HasName;
+use Filament\Models\Contracts\HasTenants;
+use Filament\Panel;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Mattiverse\Userstamps\Traits\Userstamps;
 
 class User extends Authenticatable implements HasName
@@ -86,4 +91,19 @@ class User extends Authenticatable implements HasName
     {
         return $this->user_role === UserRole::EMPLOYEE;
     }
+
+//     public function branch(): BelongsToMany
+//     {
+//         return $this->belongsToMany(Branch::class);
+//     }
+
+//    public function getTenants(Panel $panel): Collection
+// {
+//     return $this->branch()->get();
+// }
+
+//     public function canAccessTenant(Model $tenant): bool
+//     {
+//         return $this->branch()->whereKey($tenant)->exists();
+//     }
 }

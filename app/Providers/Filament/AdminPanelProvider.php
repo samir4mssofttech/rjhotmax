@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Admin\Pages\EditBranchProfile;
+use App\Filament\Admin\Pages\RegisterBranch as PagesRegisterBranch;
+use App\Models\Branch;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -63,6 +66,11 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
+            // ->tenant(Branch::class)   // branch = tenant
+            // ->tenantRegistration(PagesRegisterBranch::class)
+            // ->tenantProfile(EditBranchProfile::class)
+            // ->tenantMenu(true)
+
             ->globalSearchDebounce('750ms')
             ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->globalSearchFieldKeyBindingSuffix()

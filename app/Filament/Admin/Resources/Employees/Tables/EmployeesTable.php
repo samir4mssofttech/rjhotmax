@@ -3,12 +3,17 @@
 namespace App\Filament\Admin\Resources\Employees\Tables;
 
 use App\Enums\EmployeeStatus;
+use App\Helpers\CurrencyHelper;
 use Carbon\Carbon;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -21,6 +26,10 @@ class EmployeesTable
         return $table
             ->columns([
                 TextColumn::make('account_number')->label('Employee Id'),
+                ImageColumn::make('profile_photo')
+                    ->label('Photo')
+                    ->circular()
+                    ->size(40),
                 TextColumn::make('name')
                     ->label('Name')
                     ->searchable()
@@ -38,6 +47,7 @@ class EmployeesTable
                 TextColumn::make('salary')
                     ->numeric()
                     ->label('Salary')
+                    ->getStateUsing(fn($record) => CurrencyHelper::paisaToRupee($record->salary))
                     ->money('INR', true),
                 TextColumn::make('join_date')
                     ->label('Join Date')
@@ -77,30 +87,53 @@ class EmployeesTable
                     ->numeric()
                     ->label('Basic Salary')
                     ->money('INR', true)
+                    ->getStateUsing(fn($record) => CurrencyHelper::paisaToRupee($record->basic_salary))
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('hra')
                     ->numeric()
                     ->label('HRA')
                     ->money('INR', true)
                     ->placeholder('Not Assigned')
+                    ->getStateUsing(fn($record) => CurrencyHelper::paisaToRupee($record->hra))
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('conveyance')
                     ->numeric()
                     ->label('Conveyance')
                     ->money('INR', true)
                     ->placeholder('Not Assigned')
+                    ->getStateUsing(fn($record) => CurrencyHelper::paisaToRupee($record->conveyance))
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('medical')
                     ->numeric()
                     ->label('Medical')
                     ->money('INR', true)
                     ->placeholder('Not Assigned')
+                    ->getStateUsing(fn($record) => CurrencyHelper::paisaToRupee($record->medical))
+
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('other_allowances')
                     ->numeric()
                     ->label('Other Allowances')
                     ->money('INR', true)
+                    ->getStateUsing(fn($record) => CurrencyHelper::paisaToRupee($record->other_allowances))
+
                     ->placeholder('Not Assigned')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('pf')
+                    ->numeric()
+                    ->label('PF')
+                    ->money('INR', true)
+                    ->placeholder('Not Assigned')
+                    ->getStateUsing(fn($record) => CurrencyHelper::paisaToRupee($record->pf))
+
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('esi')
+                    ->numeric()
+                    ->label('ESI')
+                    ->money('INR', true)
+                    ->placeholder('Not Assigned')
+                    ->getStateUsing(fn($record) => CurrencyHelper::paisaToRupee($record->esi))
+
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('creator.full_name')
@@ -149,7 +182,11 @@ class EmployeesTable
                     }),
             ])
             ->recordActions([
-                EditAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    ViewAction::make(),
+                    DeleteAction::make()
+                ]),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

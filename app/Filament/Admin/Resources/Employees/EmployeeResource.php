@@ -3,16 +3,19 @@
 namespace App\Filament\Admin\Resources\Employees;
 
 use App\Enums\NavigationGroup;
+use App\Filament\Admin\Resources\Employees\Infolists\EmployeeInfolist;
 use App\Filament\Admin\Resources\Employees\Pages\CreateEmployee;
 use App\Filament\Admin\Resources\Employees\Pages\EditEmployee;
 use App\Filament\Admin\Resources\Employees\Pages\ListEmployees;
+use App\Filament\Admin\Resources\Employees\Pages\ViewEmployee;
 use App\Filament\Admin\Resources\Employees\Schemas\EmployeeForm;
+use App\Filament\Admin\Resources\Employees\Schemas\EmployeeInfolist as SchemasEmployeeInfolist;
 use App\Filament\Admin\Resources\Employees\Tables\EmployeesTable;
 use App\Models\Employee;
-use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class EmployeeResource extends Resource
 {
@@ -36,6 +39,11 @@ class EmployeeResource extends Resource
         return EmployeesTable::configure($table);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return SchemasEmployeeInfolist::configure($schema);
+    }
+
     public static function getRelations(): array
     {
         return [
@@ -49,6 +57,8 @@ class EmployeeResource extends Resource
             'index' => ListEmployees::route('/'),
             // 'create' => CreateEmployee::route('/create'),
             // 'edit' => EditEmployee::route('/{record}/edit'),
+            'view' => ViewEmployee::route('/{record}'),
+
         ];
     }
 }

@@ -13,6 +13,7 @@ class Employee extends Model
     use HasFactory, SoftDeletes, Userstamps;
 
     protected $fillable = [
+        'profile_photo',
         'name',
         'email',
         'phone',
@@ -20,12 +21,16 @@ class Employee extends Model
         'join_date',
         'confirmation_date',
         'salary',
+        'skill_type',
+        'payout_type',
         'exit_date',
         'basic_salary',
         'hra',
         'conveyance',
         'medical',
         'other_allowances',
+        'pf',
+        'esi',
         'employee_status',
         'is_active',
     ];

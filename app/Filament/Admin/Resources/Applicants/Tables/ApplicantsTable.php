@@ -3,14 +3,12 @@
 namespace App\Filament\Admin\Resources\Applicants\Tables;
 
 use App\Enums\ApplicantStatus;
-use App\Enums\UserRole;
 use App\Enums\EmployeeStatus;
+use App\Enums\UserRole;
+use App\Helpers\CurrencyHelper;
 use App\Models\Applicant;
 use App\Models\Employee;
 use App\Models\User;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
@@ -18,10 +16,13 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Grid;
 use Filament\Support\Enums\Width;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Number;
@@ -70,6 +71,7 @@ class ApplicantsTable
                 TextColumn::make('salary')
                     ->money('INR')
                     ->sortable()
+                    ->getStateUsing(fn($record) => CurrencyHelper::paisaToRupee($record->salary))
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('reportingManager.full_name')
@@ -249,7 +251,7 @@ class ApplicantsTable
                                 ->schema([
                                     TextEntry::make('applicant_code'),
                                     TextEntry::make('applicant_name'),
-                                   Select::make('branch_id')
+                                    Select::make('branch_id')
                                         ->relationship('branch', 'name')
                                         ->getOptionLabelFromRecordUsing(fn($record) => $record->display_name)
                                         ->searchable()
@@ -296,11 +298,11 @@ class ApplicantsTable
                                     'email' => $record->email_id,
                                     'phone' => $record->mobile_number,
                                     'join_date' => $data['date_of_joining'],
-                                    'salary' => $data['salary'],
+                                    'salary' => CurrencyHelper::rupeeToPaisa($data['salary']),
                                     'confirmation_date' => $record->confirmation_date, // set on acceptance
                                     'exit_date' => null,
                                     'branch_id' => $data['branch_id'],
-                                    'is_active' => false, 
+                                    'is_active' => false,
                                     'employee_status' => EmployeeStatus::PROBATION,
                                 ]);
 
