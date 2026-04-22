@@ -9,20 +9,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Shift extends Model
 {
     protected $fillable = [
-        // 'name',
+        'name',
         'type',
         'start_time',
         'end_time',
-        'grace_period_minutes',
-        'half_day_minutes',
-        'overtime_eligible',
-        'is_active',
+        // 'grace_period_minutes',
+        // 'half_day_minutes',
+        // 'overtime_eligible',
+        // 'is_active',
     ];
 
-    protected $casts = [
-        'overtime_eligible' => 'boolean',
-        'is_active'         => 'boolean',
-    ];
+    // protected $casts = [
+    //     'overtime_eligible' => 'boolean',
+    //     'is_active'         => 'boolean',
+    // ];
 
     public function weeklyOffs(): HasMany
     {

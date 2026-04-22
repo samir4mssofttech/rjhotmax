@@ -58,8 +58,12 @@ class Employee extends Model
     {
         $prefix = 'RJ';
 
-        $idPart = str_pad($this->id ?? 1, 4, '0', STR_PAD_LEFT);
+        $id = $this->id ?? 1;
 
+        // Pad only if less than 1000
+        $idPart = $id < 1000
+            ? str_pad($id, 4, '0', STR_PAD_LEFT)
+            : $id;
         return $prefix . $idPart;
     }
 

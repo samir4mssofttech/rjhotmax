@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('shifts', function (Blueprint $table) {
             $table->id();        
-                                             
+            $table->string('name');                    
             $table->enum('type', ['general', 'night', 'rotational']);  // General, Night, Rotational
             $table->time('start_time');
             $table->time('end_time');
-            $table->unsignedTinyInteger('grace_period_minutes')->default(0); // late login grace
-            $table->unsignedSmallInteger('half_day_minutes');  // minutes threshold for half-day
-            $table->boolean('overtime_eligible')->default(false);
-            $table->boolean('is_active')->default(true);
+            // $table->unsignedTinyInteger('grace_period_minutes')->default(0); // late login grace
+            // $table->unsignedSmallInteger('half_day_minutes');  // minutes threshold for half-day
+            // $table->boolean('overtime_eligible')->default(false);
+            // $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

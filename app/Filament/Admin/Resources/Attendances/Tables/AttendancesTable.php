@@ -34,25 +34,25 @@ class AttendancesTable
     TextColumn::make('check_out_time')
         ->time(),
 
-    TextColumn::make('worked_minutes')
-        ->label('Worked Hours')
-        ->formatStateUsing(fn ($state) => 
-            $state ? number_format($state / 60, 2) . ' hrs' : '—'
-        )
-        ->sortable(),
+    // TextColumn::make('worked_minutes')
+    //     ->label('Worked Hours')
+    //     ->formatStateUsing(fn ($state) => 
+    //         $state ? number_format($state / 60, 2) . ' hrs' : '—'
+    //     )
+    //     ->sortable(),
 
-    TextColumn::make('overtime_minutes')
-        ->label('Overtime')
-        ->formatStateUsing(fn ($state) => 
-            $state 
-                ? ($state >= 0 
-                    ? '+' . number_format($state / 60, 2) 
-                    : number_format($state / 60, 2)
-                  ) . ' hrs'
-                : '—'
-        )
-        ->color(fn ($state) => $state >= 0 ? 'success' : 'danger')
-        ->sortable(),
+    // TextColumn::make('overtime_minutes')
+    //     ->label('Overtime')
+    //     ->formatStateUsing(fn ($state) => 
+    //         $state 
+    //             ? ($state >= 0 
+    //                 ? '+' . number_format($state / 60, 2) 
+    //                 : number_format($state / 60, 2)
+    //               ) . ' hrs'
+    //             : '—'
+    //     )
+    //     ->color(fn ($state) => $state >= 0 ? 'success' : 'danger')
+    //     ->sortable(),
 
     IconColumn::make('is_late')
         ->label('Late')

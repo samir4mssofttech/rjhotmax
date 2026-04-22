@@ -53,8 +53,8 @@ class EmployeeForm
                     ->options([
                         'Skilled' => 'Skilled',
                         'Semi-Skilled' => 'Semi-Skilled',
-                        'Unskilled' => 'Unskilled',
                         "Fully-Skilled" => "Fully-Skilled",
+                        'Unskilled' => 'Unskilled',
                     ])
                     ->native(false)
                     ->required(),
@@ -91,7 +91,6 @@ class EmployeeForm
                         'day_worker' => 'Day Worker(Daily)',
                     ])
                     ->required()
-                    ->unique()
                     ->default(null),
 
                 ToggleButtons::make('employee_status')

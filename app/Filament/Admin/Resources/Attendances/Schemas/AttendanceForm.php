@@ -2,7 +2,12 @@
 
 namespace App\Filament\Admin\Resources\Attendances\Schemas;
 
+use App\Enums\ShiftType;
+use App\Models\Shift;
+use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -10,14 +15,9 @@ use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Schema;
-use App\Enums\ShiftType;
-use App\Models\Shift;
-use Carbon\Carbon;
-use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 
 class AttendanceForm
 {
@@ -28,19 +28,37 @@ class AttendanceForm
                 Section::make('Employee & Shift')
                     ->columns(2)
                     ->schema([
+                        Select::make('branch_id')
+                            ->relationship('branch', 'name')
+                            ->getOptionLabelFromRecordUsing(fn($record) => $record->display_name)
+                            ->native(false)
+                            ->reactive()
+                            ->required(),
                         Select::make('employee_id')
-                            ->relationship('employee', 'name')
+                            ->label('Employee')
+                            ->relationship(
+                                name: 'employee',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: function (Builder $query, callable $get) {
+                                    if ($get('branch_id')) {
+                                        $query->where('branch_id', $get('branch_id'));
+                                    }
+                                }
+                            )
                             ->searchable()
                             ->preload()
+                            ->disabled(fn($get) => !$get('branch_id'))
                             ->required(),
-
                         Select::make('shift_id')
                             ->relationship('shift', 'type')
                             ->searchable()
                             ->preload()
                             ->required()
                             ->createOptionForm([
-                                Grid::make(3)->schema([
+                                Grid::make(2)->schema([
+                                    TextInput::make('name')
+                                        ->required()
+                                        ->maxLength(255),
                                     Select::make('type')
                                         ->options(ShiftType::class)
                                         ->required(),
@@ -48,33 +66,33 @@ class AttendanceForm
                                     TimePicker::make('start_time')
                                         ->seconds(false)
                                         ->required(),
-
+            
                                     TimePicker::make('end_time')
                                         ->seconds(false)
                                         // ->after('start_time')
                                         ->required(),
 
-                                    TextInput::make('grace_period_minutes')
-                                        ->numeric()
-                                        ->default(0),
+                                    // TextInput::make('grace_period_minutes')
+                                    //     ->numeric()
+                                    //     ->default(0),
 
-                                    TextInput::make('half_day_minutes')
-                                        ->numeric()
-                                        ->default(0),
+                                    // TextInput::make('half_day_minutes')
+                                    //     ->numeric()
+                                    //     ->default(0),
 
-                                    ToggleButtons::make('overtime_eligible')
-                                        ->options([
-                                            true => 'Yes',
-                                            false => 'No',
-                                        ])
-                                        ->default(false)
-                                        ->inline()
-                                        ->required(),
+                                    // ToggleButtons::make('overtime_eligible')
+                                    //     ->options([
+                                    //         true => 'Yes',
+                                    //         false => 'No',
+                                    //     ])
+                                    //     ->default(false)
+                                    //     ->inline()
+                                    //     ->required(),
 
-                                    Toggle::make('is_active')
-                                        ->default(true)
-                                        ->inline()
-                                        ->required(),
+                                    // Toggle::make('is_active')
+                                    //     ->default(true)
+                                    //     ->inline()
+                                    //     ->required(),
                                 ]),
                             ]),
 

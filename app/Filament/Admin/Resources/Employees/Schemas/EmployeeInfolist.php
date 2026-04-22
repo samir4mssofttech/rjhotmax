@@ -41,7 +41,8 @@ class EmployeeInfolist
                             ->columnSpanFull()
                             ->schema([
                                 Grid::make(3)->schema([
-                                    TextEntry::make('branch.name')
+                                    TextEntry::make('branch.display_name')
+                                        ->badge()
                                         ->label('Branch'),
                                     TextEntry::make('join_date')
                                         ->date(),
@@ -98,12 +99,14 @@ class EmployeeInfolist
                                     TextEntry::make('pf')
                                         ->label('PF Contribution')
                                         ->color('danger')
-                                        ->suffix(' %'),
+                                        ->suffix(' %')
+                                        ->formatStateUsing(fn($state) => \App\Helpers\CurrencyHelper::intToPercent((int) $state)),
 
                                     TextEntry::make('esi')
                                         ->label('ESI Contribution')
                                         ->color('danger')
-                                        ->suffix(' %'),
+                                        ->suffix(' %')
+                                        ->formatStateUsing(fn($state) =>\App\Helpers\CurrencyHelper::intToPercent((int) $state)),
 
                                 ]),
                             ]),
