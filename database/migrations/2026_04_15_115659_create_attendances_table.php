@@ -20,8 +20,8 @@ return new class extends Migration
             $table->date('date');
             $table->time('check_in_time')->nullable();
             $table->time('check_out_time')->nullable();
-            $table->unsignedSmallInteger('worked_minutes')->nullable();    // computed
-            $table->unsignedSmallInteger('overtime_minutes')->default(0); // computed
+            $table->unsignedSmallInteger('worked_hours')->nullable();    // computed
+            $table->unsignedSmallInteger('overtime')->default(0); // computed
             $table->boolean('is_late')->default(false);
             $table->string('status')->default(Attendance::PRESENT);
             $table->string('remarks')->nullable();

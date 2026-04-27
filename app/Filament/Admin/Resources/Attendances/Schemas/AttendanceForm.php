@@ -50,7 +50,7 @@ class AttendanceForm
                             ->disabled(fn($get) => !$get('branch_id'))
                             ->required(),
                         Select::make('shift_id')
-                            ->relationship('shift', 'type')
+                            ->relationship('shift', 'name')
                             ->searchable()
                             ->preload()
                             ->required()
@@ -66,7 +66,7 @@ class AttendanceForm
                                     TimePicker::make('start_time')
                                         ->seconds(false)
                                         ->required(),
-            
+
                                     TimePicker::make('end_time')
                                         ->seconds(false)
                                         // ->after('start_time')
@@ -114,7 +114,7 @@ class AttendanceForm
                             ->live(), // Added Live
 
                         // Dynamically calculated Worked Minutes
-                        Placeholder::make('worked_hours_placeholder')
+                        Placeholder::make('worked_hours')
                             ->label('Worked Hours')
                             ->content(function ($get) {
                                 $in = $get('check_in_time');
@@ -122,11 +122,14 @@ class AttendanceForm
                                 if (!$in || !$out) return '—';
 
                                 $workedMinutes = self::calculateWorkedMinutes($in, $out);
-                                return number_format($workedMinutes / 60, 2) . ' hrs';
+                                $hours = intdiv($workedMinutes, 60);
+                                $minutes = $workedMinutes % 60;
+
+                                return "{$hours} hrs {$minutes} mins";
                             }),
 
                         // Dynamically calculated Overtime
-                        Placeholder::make('overtime_placeholder')
+                        Placeholder::make('overtime')
                             ->label('Overtime / Shortage')
                             ->helperText('Positive = Overtime, Negative = Undertime')
                             ->content(function ($get) {
@@ -137,8 +140,17 @@ class AttendanceForm
                                 if (!$in || !$out || !$shiftId) return '—';
 
                                 $diffMinutes = self::calculateOvertimeMinutes($in, $out, $shiftId);
-                                $hours = number_format($diffMinutes / 60, 2);
+                                $absMinutes = abs($diffMinutes);
+                                $hours = intdiv($absMinutes, 60);
+                                $minutes = $absMinutes % 60;
 
+                                $formatted = "{$hours} hrs {$minutes} mins";
+
+                                $color = $diffMinutes >= 0 ? 'text-success-600' : 'text-danger-600';
+
+                                return new \Illuminate\Support\HtmlString(
+                                    "<span class='{$color} font-bold'>{$formatted}</span>"
+                                );
                                 $color = $diffMinutes >= 0 ? 'text-success-600' : 'text-danger-600';
                                 return new \Illuminate\Support\HtmlString("<span class='{$color} font-bold'>{$hours} hrs</span>");
                             }),
@@ -151,18 +163,14 @@ class AttendanceForm
                             ->options([
                                 'present'     => 'Present',
                                 'absent'      => 'Absent',
-                                'half_day'    => 'Half Day',
                                 'on_leave'    => 'On Leave',
                                 'holiday'     => 'Holiday',
-                                'weekly_off'  => 'Weekly Off',
                             ])
                             ->colors([
                                 'present'    => 'success',
                                 'absent'     => 'danger',
-                                'half_day'   => 'info',
                                 'on_leave'   => 'warning',
                                 'holiday'    => 'gray',
-                                'weekly_off' => 'gray',
                             ])
                             ->default('present')
                             ->grouped()

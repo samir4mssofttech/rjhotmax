@@ -16,6 +16,9 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Carbon\Carbon;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 
 class AttendanceReportWidget extends BaseWidget implements HasForms, HasTable
 {
@@ -62,7 +65,24 @@ class AttendanceReportWidget extends BaseWidget implements HasForms, HasTable
                 fn(Employee $record): string => route('filament.admin.pages.employee-attendance-details', [
                     'employee' => $record->id // This will now be passed as ?employee=ID
                 ])
-            )->filters([])
+            )
+            // ->filters([
+            //     Filter::make('created_at')
+            //         ->form([
+            //             DatePicker::make('created_at')
+            //                 ->label('Select Date')
+            //                 ->live()
+            //                 ->afterStateUpdated(fn() => $this->resetTable()),
+            //         ])
+            //         ->query(function ($query, array $data) {
+            //             return $query
+            //                 ->when(
+            //                      $data['created_at'],
+            //                     fn($q) =>
+            //                     $q->whereDate('created_at', $data['created_at'])
+            //                 );
+            //         }),
+            // ])
             ->columns([
                 TextColumn::make('account_number')
                     ->label('Emp. Code')

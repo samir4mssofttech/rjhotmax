@@ -99,14 +99,14 @@ class EmployeeInfolist
                                     TextEntry::make('pf')
                                         ->label('PF Contribution')
                                         ->color('danger')
-                                        ->suffix(' %')
-                                        ->formatStateUsing(fn($state) => \App\Helpers\CurrencyHelper::intToPercent((int) $state)),
+                                        ->money('INR', true)
+                                        ->formatStateUsing(fn($state) => '₹' . \App\Helpers\CurrencyHelper::intToPercent((int) $state)),
 
                                     TextEntry::make('esi')
                                         ->label('ESI Contribution')
                                         ->color('danger')
-                                        ->suffix(' %')
-                                        ->formatStateUsing(fn($state) =>\App\Helpers\CurrencyHelper::intToPercent((int) $state)),
+                                        ->money('INR', true)
+                                        ->formatStateUsing(fn($state) => '₹' . \App\Helpers\CurrencyHelper::intToPercent((int) $state)),
 
                                 ]),
                             ]),

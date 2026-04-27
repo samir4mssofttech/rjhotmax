@@ -65,6 +65,30 @@
                                 <td class="p-3 font-semibold text-gray-700 dark:text-gray-300">
                                     {{ $record->work_hours ?? '0h 0m' }}
                                 </td>
+                                <td class="p-3 text-center">
+    <div class="flex items-center justify-center gap-2">
+        
+        {{-- EDIT BUTTON --}}
+        {{-- The Edit route DOES exist, so we keep it as a link --}}
+        <a href="{{ route('filament.admin.resources.attendances.edit', ['record' => $record->id]) }}" 
+           class="p-2 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-colors" 
+           title="Edit Attendance">
+            <x-heroicon-m-pencil-square class="h-5 w-5" />
+        </a>
+
+        {{-- DELETE BUTTON --}}
+        {{-- We use wire:click to call the method in the Page class --}}
+        {{-- wire:confirm provides the "Are you sure?" popup automatically --}}
+        {{-- <button 
+            wire:click="deleteAttendance({{ $record->id }})" 
+            wire:confirm="Are you sure you want to delete this attendance record?"
+            class="p-2 text-danger-600 hover:bg-danger-50 dark:hover:bg-danger-900/30 rounded-lg transition-colors" 
+            title="Delete Attendance">
+            <x-heroicon-m-trash class="h-5 w-5" />
+        </button> --}}
+
+    </div>
+</td>
                             </tr>
                         @empty
                             <tr>

@@ -73,11 +73,14 @@ class EmployeeForm
                         $salary = (float) $state;
 
                         // Calculate percentages
-                        $set('basic_salary', $salary * 0.40);      // 40%
-                        $set('hra', $salary * 0.20);               // 20%
+                        $set('basic_salary', $salary * 0.50);      // 40%  -> 50%
+                        $set('hra', $salary * 0.10);               // 20%  -> 10%
                         $set('conveyance', $salary * 0.08);        // 8%
                         $set('medical', $salary * 0.20);           // 20%
                         $set('other_allowances', $salary * 0.12);  // 12%
+                        $set('pf', $salary * 0.12);  // 12%
+                        $set('esi', $salary * 0.0075);  // 12%
+
                     })
                     ->dehydrateStateUsing(fn($state) => \App\Helpers\CurrencyHelper::rupeeToPaisa((float) $state))
                     ->formatStateUsing(fn($state) => $state ? \App\Helpers\CurrencyHelper::paisaToRupee((int) $state) : null),
@@ -112,6 +115,7 @@ class EmployeeForm
                     ->inline(false),
 
                 TextInput::make('basic_salary')
+                    ->helperText('50% of CTC')
                     ->numeric()
                     ->prefix('₹')
                     ->label('Basic Salary')
@@ -121,6 +125,7 @@ class EmployeeForm
                     ->visible(fn(Get $get) => $get('is_active')),
 
                 TextInput::make('hra')
+                    ->helperText('10% of CTC')
                     ->numeric()
                     ->prefix('₹')
                     ->label('HRA')
@@ -130,6 +135,7 @@ class EmployeeForm
                     ->visible(fn(Get $get) => $get('is_active')),
 
                 TextInput::make('conveyance')
+                    ->helperText('8% of CTC')
                     ->numeric()
                     ->prefix('₹')
                     ->label('Conveyance')
@@ -138,6 +144,7 @@ class EmployeeForm
                     ->visible(fn(Get $get) => $get('is_active')),
 
                 TextInput::make('medical')
+                    ->helperText('20% of CTC')
                     ->numeric()
                     ->prefix('₹')
                     ->label('Medical')
@@ -146,6 +153,7 @@ class EmployeeForm
                     ->visible(fn(Get $get) => $get('is_active')),
 
                 TextInput::make('other_allowances')
+                    ->helperText('12% of CTC')
                     ->numeric()
                     ->prefix('₹')
                     ->label('Other Allowances')
@@ -154,14 +162,16 @@ class EmployeeForm
                     ->visible(fn(Get $get) => $get('is_active')),
 
                 TextInput::make('pf')
-                    ->suffix('%')
+                    ->helperText('12% of CTC. This amount will be deducted from the employee\'s salary and contributed to PF fund.')
+                    ->prefix('₹')
                     ->label('PF Contribution')
                     ->dehydrateStateUsing(fn($state) => CurrencyHelper::percentToInt((float) $state))
                     ->formatStateUsing(fn($state) => $state ? \App\Helpers\CurrencyHelper::intToPercent((int) $state) : null)
                     ->visible(fn(Get $get) => $get('is_active')),
 
                 TextInput::make('esi')
-                    ->suffix('%')
+                    ->helperText('0.75% of CTC. This amount will be deducted from the employee\'s salary and contributed to ESI fund.')
+                    ->prefix('₹')
                     ->label('ESI Contribution')
                     ->dehydrateStateUsing(fn($state) => CurrencyHelper::percentToInt((float) $state))
                     ->formatStateUsing(fn($state) => $state ? \App\Helpers\CurrencyHelper::intToPercent((int) $state) : null)
