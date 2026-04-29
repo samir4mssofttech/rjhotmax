@@ -73,13 +73,33 @@ class EmployeeForm
                         $salary = (float) $state;
 
                         // Calculate percentages
-                        $set('basic_salary', $salary * 0.50);      // 40%  -> 50%
-                        $set('hra', $salary * 0.10);               // 20%  -> 10%
-                        $set('conveyance', $salary * 0.08);        // 8%
-                        $set('medical', $salary * 0.20);           // 20%
-                        $set('other_allowances', $salary * 0.12);  // 12%
-                        $set('pf', $salary * 0.12);  // 12%
-                        $set('esi', $salary * 0.0075);  // 12%
+                        // $set('basic_salary', $salary * 0.50);      // 40%  -> 50%
+                        // $set('hra', $salary * 0.10);               // 20%  -> 10%
+                        // $set('conveyance', $salary * 0.08);        // 8%
+                        // $set('medical', $salary * 0.20);           // 20%
+                        // $set('other_allowances', $salary * 0.12);  // 12%
+                        // $set('pf', $salary * 0.12);  // 12%
+                        // $set('esi', $salary * 0.0075);  // 12%
+
+                        // First calculate salary components
+    $basic = $salary * 0.50;
+    $hra = $salary * 0.10;
+    $conveyance = $salary * 0.08;
+    $medical = $salary * 0.20;
+    $other = $salary * 0.12;
+
+    // Set components
+    $set('basic_salary', $basic);
+    $set('hra', $hra);
+    $set('conveyance', $conveyance);
+    $set('medical', $medical);
+    $set('other_allowances', $other);
+
+    // ✅ PF = 12% of BASIC SALARY
+    $set('pf', $basic * 0.12);
+
+    // ✅ ESI = 0.75% of GROSS (CTC here)
+    $set('esi', $salary * 0.0075);
 
                     })
                     ->dehydrateStateUsing(fn($state) => \App\Helpers\CurrencyHelper::rupeeToPaisa((float) $state))
@@ -90,7 +110,7 @@ class EmployeeForm
                     ->label('Payout Type')
                     ->native(false)
                     ->options([
-                        'salried' => 'Salaried(Monthly)',
+                        'salaried' => 'Salaried(Monthly)',
                         'day_worker' => 'Day Worker(Daily)',
                     ])
                     ->required()
