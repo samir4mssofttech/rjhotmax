@@ -12,6 +12,7 @@ use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -127,6 +128,9 @@ class ApplicantsTable
                         ->slideOver(),
                     EditAction::make()
                         ->slideOver(),
+                    // DeleteAction::make()
+                    //     ->requiresConfirmation()
+                    //     ->modalDescription('Are you sure you want to delete this applicant? This action cannot be undone.'),
                     Action::make('send_offer_letter')
                         ->visible(fn(Applicant $record) => $record->status === ApplicantStatus::INITIATED)
                         ->icon(ApplicantStatus::OFFERED->getIcon())
@@ -185,6 +189,11 @@ class ApplicantsTable
                                 'salary' => $data['salary'] ?? null,
                                 'status' => ApplicantStatus::OFFERED,
                             ]);
+                            \Filament\Notifications\Notification::make()
+                                ->title('Success!')
+                                ->body('The offer letter status has been updated.')
+                                ->success()
+                                ->send();
                         }),
                     Action::make('offer_accepted')
                         ->visible(fn(Applicant $record) => $record->status === ApplicantStatus::OFFERED)
@@ -199,6 +208,11 @@ class ApplicantsTable
                                 'confirmation_date' => now()->toDateString(), // ✅ auto-set on acceptance
 
                             ]);
+                            \Filament\Notifications\Notification::make()
+                                ->title('Success!')
+                                ->body('The offer has been marked as accepted.')
+                                ->success()
+                                ->send();
                         }),
                     Action::make('offer_rejected')
                         ->visible(fn(Applicant $record) => $record->status === ApplicantStatus::OFFERED)
@@ -211,6 +225,11 @@ class ApplicantsTable
                             $record->update([
                                 'status' => ApplicantStatus::REJECTED,
                             ]);
+                            \Filament\Notifications\Notification::make()
+                                ->title('Success!')
+                                ->body('The offer has been marked as rejected.')
+                                ->success()
+                                ->send();
                         }),
                     Action::make('send_joining_letter')
                         ->visible(fn(Applicant $record) => $record->status === ApplicantStatus::ACCEPTED)
@@ -223,6 +242,11 @@ class ApplicantsTable
                             $record->update([
                                 'status' => ApplicantStatus::JOINING_LETTER_SENT,
                             ]);
+                            \Filament\Notifications\Notification::make()
+                                ->title('Success!')
+                                ->body('The joining letter status has been updated.')
+                                ->success()
+                                ->send();
                         }),
                     Action::make('send_appointment_letter')
                         ->visible(fn(Applicant $record) => $record->status === ApplicantStatus::JOINING_LETTER_SENT)
@@ -307,31 +331,31 @@ class ApplicantsTable
                                 ]);
 
                                 // 3️⃣ Create User
-                                $user = User::firstOrCreate(
-                                    ['email' => $record->email_id],
-                                    [
-                                        'full_name' => $record->applicant_name,
-                                        'employee_code' => $employeeCode,
-                                        'password' => bcrypt(Str::random(10)),
-                                        'user_role' => UserRole::EMPLOYEE,
-                                        'department' => $record->position,
-                                        'designation' => $record->designation, // 👈 from applicant
-                                        'mobile_number' => $record->mobile_number,
-                                        'date_of_birth' => $record->date_of_birth,
-                                        'gender' => $record->gender,
-                                        'aadhaar_number' => $record->aadhar_number,
-                                        'pan_number' => $record->pan_number,
-                                        'state' => $record->state,
-                                        'city' => $record->city,
-                                        'address' => $record->address,
-                                    ]
-                                );
+                                // $user = User::firstOrCreate(
+                                //     ['email' => $record->email_id],
+                                //     [
+                                //         'full_name' => $record->applicant_name,
+                                //         'employee_code' => $employeeCode,
+                                //         'password' => bcrypt(Str::random(10)),
+                                //         'user_role' => UserRole::EMPLOYEE,
+                                //         'department' => $record->position,
+                                //         'designation' => $record->designation, // 👈 from applicant
+                                //         'mobile_number' => $record->mobile_number,
+                                //         'date_of_birth' => $record->date_of_birth,
+                                //         'gender' => $record->gender,
+                                //         'aadhaar_number' => $record->aadhar_number,
+                                //         'pan_number' => $record->pan_number,
+                                //         'state' => $record->state,
+                                //         'city' => $record->city,
+                                //         'address' => $record->address,
+                                //     ]
+                                // );
                                 // Password::broker('users')->sendResetLink(['email' => $user->email]);
 
                                 // 4️⃣ Attach user to member
-                                $member->update([
-                                    'user_id' => $user->id,
-                                ]);
+                                // $member->update([
+                                //     'user_id' => $user->id,
+                                // ]);
 
                                 // 5️⃣ Update Applicant Status
                                 $record->update([
@@ -340,9 +364,14 @@ class ApplicantsTable
                                 ]);
 
                                 // 6️⃣ Generate Reset Token for USER (not Applicant)
-                                $token = Password::createToken($user);
+                                // $token = Password::createToken($user);
                                 // $user->sendPasswordSetNotification($token);
                             });
+                            
+                            // Send Notification instead of Mail
+                            \Illuminate\Support\Facades\Notification::route('mail', $record->email_id)
+                                ->notify(new \App\Notifications\AppointmentLetterNotification($record));
+
                             // ADD THIS: This shows the notification on the web application for the ADMIN
                             \Filament\Notifications\Notification::make()
                                 ->title('Success!')
