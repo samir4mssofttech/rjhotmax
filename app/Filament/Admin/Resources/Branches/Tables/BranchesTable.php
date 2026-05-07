@@ -2,6 +2,8 @@
 
 namespace App\Filament\Admin\Resources\Branches\Tables;
 
+use App\Filament\Admin\Resources\Branches\Pages\TakeAttendance;
+use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -10,6 +12,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
@@ -33,6 +36,11 @@ class BranchesTable
                 TrashedFilter::make(),
             ])
             ->recordActions([
+                Action::make('takeAttendance')
+                    ->label('Take Attendance')
+                    ->icon(Heroicon::ClipboardDocumentCheck)
+                    ->color('success')
+                    ->url(fn ($record) => TakeAttendance::getUrl(['record' => $record])),
                ActionGroup::make([
                      DeleteAction::make(),
                      EditAction::make(),

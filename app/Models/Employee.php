@@ -33,6 +33,7 @@ class Employee extends Model
         'esi',
         'employee_status',
         'is_active',
+        'shift_id',
     ];
     protected $casts = [
         'is_active' => 'boolean',
@@ -44,6 +45,11 @@ class Employee extends Model
     public function branch()
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    public function shift()
+    {
+        return $this->belongsTo(Shift::class);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Employees\Schemas;
 
 use App\Enums\EmployeeStatus;
+use App\Enums\ShiftType;
 use App\Helpers\CurrencyHelper;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -15,6 +16,8 @@ use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\TimePicker;
 
 class EmployeeForm
 {
@@ -27,7 +30,7 @@ class EmployeeForm
                     ->image()
                     ->avatar()
                     ->directory('employee-photos')
-                    ->visibility('public'),
+                    ->disk('public'),
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -45,6 +48,31 @@ class EmployeeForm
                     ->relationship('branch', 'name')
                     ->getOptionLabelFromRecordUsing(fn($record) => $record->display_name)
                     ->native(false),
+                Select::make('shift_id')
+                    ->relationship('shift', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->createOptionForm([
+                        Grid::make(2)->schema([
+                            TextInput::make('name')
+                                ->required()
+                                ->maxLength(255),
+                            Select::make('type')
+                                ->options(ShiftType::class)
+                                ->required(),
+
+                            TimePicker::make('start_time')
+                                ->seconds(false)
+                                ->required(),
+
+                            TimePicker::make('end_time')
+                                ->seconds(false)
+                                ->required(),
+
+                        ]),
+                    ]),
+
                 DatePicker::make('join_date')
                     ->default(now())
                     ->required(),
@@ -82,25 +110,24 @@ class EmployeeForm
                         // $set('esi', $salary * 0.0075);  // 12%
 
                         // First calculate salary components
-    $basic = $salary * 0.50;
-    $hra = $salary * 0.10;
-    $conveyance = $salary * 0.08;
-    $medical = $salary * 0.20;
-    $other = $salary * 0.12;
+                        $basic = $salary * 0.50;
+                        $hra = $salary * 0.10;
+                        $conveyance = $salary * 0.08;
+                        $medical = $salary * 0.20;
+                        $other = $salary * 0.12;
 
-    // Set components
-    $set('basic_salary', $basic);
-    $set('hra', $hra);
-    $set('conveyance', $conveyance);
-    $set('medical', $medical);
-    $set('other_allowances', $other);
+                        // Set components
+                        $set('basic_salary', $basic);
+                        $set('hra', $hra);
+                        $set('conveyance', $conveyance);
+                        $set('medical', $medical);
+                        $set('other_allowances', $other);
 
-    // ✅ PF = 12% of BASIC SALARY
-    $set('pf', $basic * 0.12);
+                        // ✅ PF = 12% of BASIC SALARY
+                        $set('pf', $basic * 0.12);
 
-    // ✅ ESI = 0.75% of GROSS (CTC here)
-    $set('esi', $salary * 0.0075);
-
+                        // ✅ ESI = 0.75% of GROSS (CTC here)
+                        $set('esi', $salary * 0.0075);
                     })
                     ->dehydrateStateUsing(fn($state) => \App\Helpers\CurrencyHelper::rupeeToPaisa((float) $state))
                     ->formatStateUsing(fn($state) => $state ? \App\Helpers\CurrencyHelper::paisaToRupee((int) $state) : null),

@@ -34,6 +34,11 @@ class Branch extends Model
         return $this->hasMany(Applicant::class);
     }
 
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
 //     public function users(): BelongsToMany
 // {
 //     return $this->belongsToMany(User::class);

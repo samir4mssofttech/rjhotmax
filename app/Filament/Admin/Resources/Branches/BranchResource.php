@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources\Branches;
 use App\Filament\Admin\Resources\Branches\Pages\CreateBranch;
 use App\Filament\Admin\Resources\Branches\Pages\EditBranch;
 use App\Filament\Admin\Resources\Branches\Pages\ListBranches;
+use App\Filament\Admin\Resources\Branches\Pages\TakeAttendance;
 use App\Filament\Admin\Resources\Branches\Pages\ViewBranch;
 use App\Filament\Admin\Resources\Branches\Schemas\BranchForm;
 use App\Filament\Admin\Resources\Branches\Schemas\BranchInfolist;
@@ -24,7 +25,7 @@ class BranchResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::BuildingOffice2;
 
-    protected static ?string $navigationLabel = 'Branch Setup';
+    protected static ?string $navigationLabel = 'All Branches';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -54,6 +55,7 @@ class BranchResource extends Resource
     {
         return [
             'index' => ListBranches::route('/'),
+            'take-attendance' => TakeAttendance::route('/{record}/attendance'),
             // 'create' => CreateBranch::route('/create'),
             // 'view' => ViewBranch::route('/{record}'),
             // 'edit' => EditBranch::route('/{record}/edit'),

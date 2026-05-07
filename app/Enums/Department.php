@@ -10,34 +10,39 @@ use Filament\Support\Icons\Heroicon;
 
 enum Department: string implements HasColor, HasIcon, HasLabel
 {
-    case SALES = 'sales';
-    case MANAGEMENT = 'management';
-    case SUPPORT = 'support';
+    case SKILLED = 'skilled';
+    case SEMI_SKILLED = 'semi_skilled';
+    case HIGH_SKILLED = 'high_skilled';
+    case UNSKILLED = 'unskilled';
+
 
     public function getColor(): string
     {
         return match ($this) {
-            self::SALES => 'info',
-            self::MANAGEMENT => 'success',
-            self::SUPPORT => 'primary',
+            self::SKILLED => 'info',
+            self::SEMI_SKILLED => 'success',
+            self::HIGH_SKILLED => 'primary',
+            self::UNSKILLED => 'secondary'
         };
     }
 
     public function getIcon(): BackedEnum
     {
         return match ($this) {
-            self::SALES => Heroicon::Briefcase,
-            self::MANAGEMENT => Heroicon::Cog8Tooth,
-            self::SUPPORT => Heroicon::UserGroup,
+            self::SKILLED => Heroicon::OutlinedSpeakerWave,
+            self::SEMI_SKILLED => Heroicon::Star,
+            self::HIGH_SKILLED => Heroicon::Sparkles,
+            self::UNSKILLED => Heroicon::UserCircle,
         };
     }
 
     public function getLabel(): string
     {
         return match ($this) {
-            self::SALES => 'Sales',
-            self::MANAGEMENT => 'Management',
-            self::SUPPORT => 'Support',
+            self::SKILLED => 'Skilled',
+            self::SEMI_SKILLED => 'Semi Skilled',
+            self::HIGH_SKILLED => 'High Skilled',
+            self::UNSKILLED => 'Unskilled',
         };
     }
 }
