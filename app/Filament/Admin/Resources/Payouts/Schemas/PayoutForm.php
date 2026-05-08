@@ -78,7 +78,7 @@ class PayoutForm
 
                                     TextInput::make('payout_month')
                                         ->label('Month (YYYY-MM)')
-                                        ->placeholder('2025-01')
+                                        ->placeholder('2026-01')
                                         ->required()
                                         ->live()
                                         ->afterStateUpdated(function (Get $get, Set $set) {

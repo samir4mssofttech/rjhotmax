@@ -233,14 +233,21 @@ class ApplicantsTable
                         ->color(ApplicantStatus::JOINING_LETTER_SENT->getColor())
                         ->label('Send Joining Letter')
                         ->requiresConfirmation()
-                        ->modalDescription('Are you sure you\'d like to send the joining letter? This cannot be undone.')
+                        ->modalDescription('Are you sure you\'d like to send the joining letter to the applicant\'s email? This cannot be undone.')
                         ->action(function (Applicant $record): void {
                             $record->update([
                                 'status' => ApplicantStatus::JOINING_LETTER_SENT,
                             ]);
+
+                            // Send Joining/Offer Letter PDF via Email
+                            if (!empty($record->email_id)) {
+                                \Illuminate\Support\Facades\Notification::route('mail', $record->email_id)
+                                    ->notify(new \App\Notifications\JoiningLetterNotification($record));
+                            }
+
                             \Filament\Notifications\Notification::make()
                                 ->title('Success!')
-                                ->body('The joining letter status has been updated.')
+                                ->body('The joining letter has been generated and emailed to the applicant.')
                                 ->success()
                                 ->send();
                         }),
