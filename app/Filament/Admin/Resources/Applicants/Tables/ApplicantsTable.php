@@ -4,15 +4,12 @@ namespace App\Filament\Admin\Resources\Applicants\Tables;
 
 use App\Enums\ApplicantStatus;
 use App\Enums\EmployeeStatus;
-use App\Enums\UserRole;
 use App\Helpers\CurrencyHelper;
 use App\Models\Applicant;
 use App\Models\Employee;
-use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -25,7 +22,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 // use Filament\Tables\Filters\SelectFilter;
@@ -319,6 +315,7 @@ class ApplicantsTable
                                     'applicant_id' => $record->id,
                                     'employee_code' => $employeeCode,
                                     'name' => $record->applicant_name,
+                                    'skill_type' => $record->position,
                                     'email' => $record->email_id,
                                     'phone' => $record->mobile_number,
                                     'join_date' => $data['date_of_joining'],

@@ -78,8 +78,7 @@ class PayoutInfolist
                                     TextEntry::make('overtime_minutes')
                                         ->label('OT Mins')
                                         ->alignCenter(),
-                                ])
-                                ->extraAttributes(['class' => 'bg-gray-50 p-4 rounded-xl mb-6']),
+                                ]),
 
                             // Earnings & Deductions Side-by-Side
                             Grid::make(2)

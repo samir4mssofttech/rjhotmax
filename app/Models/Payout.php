@@ -59,43 +59,59 @@ class Payout extends Model
         $startDate = \Carbon\Carbon::createFromDate($year, $mon, 1)->startOfMonth();
         $endDate   = $startDate->copy()->endOfMonth();
 
-        // Total working days (Mon–Sat, excluding Sundays — adjust as needed)
-        $totalWorkingDays = 0;
-        $current = $startDate->copy();
-        while ($current->lte($endDate)) {
-            if ($current->dayOfWeek !== \Carbon\Carbon::SUNDAY) {
-                $totalWorkingDays++;
-            }
-            $current->addDay();
-        }
+        // Standard 26 working days calculation
+        $totalWorkingDays = 26;
 
         // Attendance stats
         $attendances = \App\Models\Attendance::where('employee_id', $employee->id)
             ->whereBetween('date', [$startDate, $endDate])
             ->get();
-    // ✅ Compare using Enum cases directly
-    $presentDays = $attendances->filter(
-        fn ($a) => in_array($a->status, [
-            \App\Enums\Attendance::PRESENT,
-            \App\Enums\Attendance::HALF_DAY,
-        ])
-    )->count();
+        // Compare using Enum cases directly
+        $presentDays = $attendances->filter(
+            fn ($a) => in_array($a->status, [
+                \App\Enums\Attendance::PRESENT,
+                \App\Enums\Attendance::HALF_DAY,
+            ])
+        )->count();
 
-    // ✅ is_late is cast to boolean so this works fine
-    $lateDays = $attendances->where('is_late', true)->count();
-        // $presentDays     = $attendances->whereIn('status', ['present', 'half_day'])->count();
-        // $lateDays        = $attendances->where('is_late', true)->count();
+        // is_late is cast to boolean so this works fine
+        $lateDays = $attendances->where('is_late', true)->count();
         $absentDays      = max(0, $totalWorkingDays - $presentDays);
         $overtimeMinutes = $attendances->sum('overtime');
 
-        // Per-day salary for deduction calculation
-        $grossFixed = $employee->basic_salary
-            + $employee->hra
-            + $employee->conveyance
-            + $employee->medical
-            + $employee->other_allowances;
+        // Skill-based rates in paisa
+        $rateMap = [
+            'Unskilled'     => 46200,
+            'Semi-Skilled'  => 51200,
+            'Skilled'       => 56200,
+            'Fully-Skilled' => 61200,
+        ];
 
-        $perDayRate       = $totalWorkingDays > 0 ? $grossFixed / $totalWorkingDays : 0;
+        $basicSalaryPaisa = $employee->basic_salary;
+        $hraPaisa         = $employee->hra;
+        $conveyancePaisa  = $employee->conveyance;
+        $medicalPaisa     = $employee->medical;
+        $otherAllowancesPaisa = $employee->other_allowances;
+
+        // Check if employee has a skill type with a defined rate
+        if (!empty($employee->skill_type) && isset($rateMap[$employee->skill_type])) {
+            $perDayRate = $rateMap[$employee->skill_type];
+            // We use the skill rate to determine their exact gross for the 26-day standard
+            $grossFixed = $perDayRate * $totalWorkingDays;
+            
+            // Retain the actual DB values for basic, HRA, etc. instead of overriding them to 0
+            // so they display accurately in the Payout Form as seen in the employee view page.
+        } else {
+            // Per-day salary for deduction calculation based on fixed components
+            $grossFixed = $basicSalaryPaisa
+                + $hraPaisa
+                + $conveyancePaisa
+                + $medicalPaisa
+                + $otherAllowancesPaisa;
+
+            $perDayRate = $totalWorkingDays > 0 ? $grossFixed / $totalWorkingDays : 0;
+        }
+
         $absentDeduction  = round($perDayRate * $absentDays, 2);
         $lateDeduction    = round(($perDayRate / 2) * ($lateDays > 3 ? $lateDays - 3 : 0), 2); // grace 3 lates
         $overtimeAmount   = round(($perDayRate / 8 / 60) * $overtimeMinutes, 2); // hourly OT rate
@@ -113,11 +129,11 @@ class Payout extends Model
             'absent_days'        => $absentDays,
             'late_days'          => $lateDays,
             'overtime_minutes'   => $overtimeMinutes,
-            'basic_salary'       => CurrencyHelper::paisaToRupee($employee->basic_salary),
-            'hra'                => CurrencyHelper::paisaToRupee($employee->hra),
-            'conveyance'         => CurrencyHelper::paisaToRupee($employee->conveyance),
-            'medical'            => CurrencyHelper::paisaToRupee($employee->medical),
-            'other_allowances'   => CurrencyHelper::paisaToRupee($employee->other_allowances),
+            'basic_salary'       => CurrencyHelper::paisaToRupee($basicSalaryPaisa),
+            'hra'                => CurrencyHelper::paisaToRupee($hraPaisa),
+            'conveyance'         => CurrencyHelper::paisaToRupee($conveyancePaisa),
+            'medical'            => CurrencyHelper::paisaToRupee($medicalPaisa),
+            'other_allowances'   => CurrencyHelper::paisaToRupee($otherAllowancesPaisa),
             'overtime_amount'    => CurrencyHelper::paisaToRupee($overtimeAmount),
             'gross_salary'       => CurrencyHelper::paisaToRupee($grossSalary),
             'pf'                 => CurrencyHelper::paisaToRupee($pf),
