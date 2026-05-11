@@ -40,7 +40,7 @@ class EmployeeInfolist
                         Section::make('Employment Details')
                             ->columnSpanFull()
                             ->schema([
-                                Grid::make(3)->schema([
+                                Grid::make(4)->schema([
                                     TextEntry::make('branch.display_name')
                                         ->badge()
                                         ->label('Branch'),
@@ -50,6 +50,9 @@ class EmployeeInfolist
                                         ->badge(),
                                     TextEntry::make('payout_type')
                                         ->label('Payment Cycle'),
+                                    TextEntry::make('security_money')
+                                        ->money('INR')
+                                        ->formatStateUsing(fn($state) => '₹' . \App\Helpers\CurrencyHelper::paisaToRupee((int) $state)),
                                     TextEntry::make('employee_status')
                                         ->badge()
                                         ->color(fn(EmployeeStatus $state): string => match ($state) {

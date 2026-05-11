@@ -21,6 +21,7 @@ class Employee extends Model
         'join_date',
         'confirmation_date',
         'salary',
+        'security_money',
         'skill_type',
         'payout_type',
         'exit_date',

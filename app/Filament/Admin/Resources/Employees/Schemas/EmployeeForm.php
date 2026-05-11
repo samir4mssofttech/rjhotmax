@@ -132,7 +132,13 @@ class EmployeeForm
                     ->dehydrateStateUsing(fn($state) => \App\Helpers\CurrencyHelper::rupeeToPaisa((float) $state))
                     ->formatStateUsing(fn($state) => $state ? \App\Helpers\CurrencyHelper::paisaToRupee((int) $state) : null),
                 // ----------------------------
-
+                TextInput::make('security_money')
+                    ->numeric()
+                    ->prefix('₹')
+                    ->label('Security Money')
+                    ->default(0)
+                    ->dehydrateStateUsing(fn($state) => \App\Helpers\CurrencyHelper::rupeeToPaisa((float) $state))
+                    ->formatStateUsing(fn($state) => $state ? \App\Helpers\CurrencyHelper::paisaToRupee((int) $state) : null),
                 Select::make('payout_type')
                     ->label('Payout Type')
                     ->native(false)

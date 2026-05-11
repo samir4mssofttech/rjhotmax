@@ -64,6 +64,10 @@ class PayoutForm
                                         ->label('Employee')
                                         ->relationship('employee', 'name', function ($query, Get $get) {
                                             $branchId = $get('branch_id');
+
+                                            // Show only active employees
+                                            $query->where('is_active', true);
+
                                             if ($branchId) {
                                                 $query->where('branch_id', $branchId);
                                             }
@@ -124,12 +128,25 @@ class PayoutForm
                                     Section::make('Earnings')
                                         ->columnSpan(1)
                                         ->schema([
-                                            TextInput::make('basic_salary')->label('Basic Salary')->numeric()->prefix('₹')->readOnly(),
-                                            TextInput::make('hra')->label('HRA')->numeric()->prefix('₹')->readOnly(),
-                                            TextInput::make('conveyance')->label('Conveyance')->numeric()->prefix('₹')->readOnly(),
-                                            TextInput::make('medical')->label('Medical')->numeric()->prefix('₹')->readOnly(),
-                                            TextInput::make('other_allowances')->label('Other Allowances')->numeric()->prefix('₹')->readOnly(),
-                                            TextInput::make('overtime_amount')->label('Overtime Amount')->numeric()->prefix('₹')->readOnly(),
+                                            TextInput::make('basic_salary')
+                                                ->label('Basic Salary')
+                                                ->numeric()->prefix('₹')
+                                                ->readOnly(),
+                                            TextInput::make('hra')
+                                                ->label('HRA')->numeric()
+                                                ->prefix('₹')->readOnly(),
+                                            TextInput::make('conveyance')
+                                                ->label('Conveyance')->numeric()
+                                                ->prefix('₹')->readOnly(),
+                                            TextInput::make('medical')
+                                                ->label('Medical')->numeric()
+                                                ->prefix('₹')->readOnly(),
+                                            TextInput::make('other_allowances')
+                                                ->label('Other Allowances')->numeric()
+                                                ->prefix('₹')->readOnly(),
+                                            TextInput::make('overtime_amount')
+                                                ->label('Overtime Amount')->numeric()
+                                                ->prefix('₹')->readOnly(),
                                             TextInput::make('gross_salary')
                                                 ->label('Gross Salary')
                                                 ->numeric()->prefix('₹')->readOnly()
