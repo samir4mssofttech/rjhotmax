@@ -9,6 +9,7 @@ use App\Models\Applicant;
 use App\Models\Employee;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
@@ -19,7 +20,6 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Number;
@@ -116,7 +116,7 @@ class ApplicantsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make(),
+                //
             ])
             ->recordActions([
                 ActionGroup::make([
@@ -124,9 +124,9 @@ class ApplicantsTable
                         ->slideOver(),
                     EditAction::make()
                         ->slideOver(),
-                    // DeleteAction::make()
-                    //     ->requiresConfirmation()
-                    //     ->modalDescription('Are you sure you want to delete this applicant? This action cannot be undone.'),
+                    DeleteAction::make()
+                        ->requiresConfirmation()
+                        ->modalDescription('Are you sure you want to delete this applicant? This action cannot be undone.'),
                     Action::make('send_offer_letter')
                         ->visible(fn(Applicant $record) => $record->status === ApplicantStatus::INITIATED)
                         ->icon(ApplicantStatus::OFFERED->getIcon())
@@ -185,9 +185,13 @@ class ApplicantsTable
                                 'salary' => $data['salary'] ?? null,
                                 'status' => ApplicantStatus::OFFERED,
                             ]);
+                            if (!empty($record->email_id)) {
+                                \Illuminate\Support\Facades\Notification::route('mail', $record->email_id)
+                                    ->notify(new \App\Notifications\OfferLetterNotification($record));
+                            }
                             \Filament\Notifications\Notification::make()
                                 ->title('Success!')
-                                ->body('The offer letter status has been updated.')
+                                ->body('The offer letter has been generated and emailed to the applicant.')
                                 ->success()
                                 ->send();
                         }),
