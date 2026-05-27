@@ -10,6 +10,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
@@ -19,24 +20,80 @@ use Filament\Schemas\Schema;
 
 class PayoutForm
 {
-
     // ── Auto-fill salary data from Employee + Attendance ───────────
     protected static function recalculate(Get $get, Set $set): void
     {
         $employeeId = $get('employee_id');
-        $month      = $get('payout_month');
+        $month = $get('payout_month');
 
-        if (! $employeeId || ! $month || ! preg_match('/^\d{4}-\d{2}$/', $month)) {
+        if (!$employeeId || !$month || !preg_match('/^\d{4}-\d{2}$/', $month)) {
+            $set('eligibility_message', null);
+            $set('is_prorated', false);
+            $set('proration_start_date', null);
+            $set('proration_end_date', null);
+            $set('prorated_days', null);
             return;
         }
 
         $employee = Employee::find($employeeId);
-        if (! $employee) return;
+        if (!$employee) return;
 
+        // Calculate eligibility first
+        $eligibility = Payout::calculateEligibilityPeriod($employee, $month);
+        
+        // Check if eligible
+        if ($eligibility['eligible_days'] === 0 && $eligibility['reason']) {
+            $set('eligibility_message', '⚠️ ' . $eligibility['reason']);
+            $set('is_prorated', true);
+            $set('proration_start_date', $eligibility['start_date']);
+            $set('proration_end_date', $eligibility['end_date']);
+            $set('prorated_days', 0);
+            
+            // Clear all salary fields
+            $data = Payout::calculateForEmployee($employee, $month);
+            if (isset($data['error'])) {
+                foreach (['basic_salary', 'hra', 'conveyance', 'medical', 'other_allowances', 
+                         'overtime_amount', 'gross_salary', 'pf', 'esi', 'absent_deduction', 
+                         'late_deduction', 'other_deductions', 'total_deductions', 'net_salary',
+                         'total_working_days', 'present_days', 'absent_days', 'late_days', 'overtime_minutes'] as $field) {
+                    $set($field, null);
+                }
+            }
+            return;
+        }
+
+        // Calculate salary with proration
         $data = Payout::calculateForEmployee($employee, $month);
 
+        if (isset($data['error'])) {
+            $set('eligibility_message', '❌ ' . $data['error']);
+            return;
+        }
+
+        // Set proration info
+        $set('is_prorated', $data['is_prorated'] ?? false);
+        $set('proration_start_date', $data['proration_start_date']);
+        $set('proration_end_date', $data['proration_end_date']);
+        $set('prorated_days', $data['prorated_days']);
+
+        // Set eligibility message
+        if ($data['is_prorated']) {
+            $message = sprintf(
+                '✓ Prorated Salary: %d days (%s to %s) with %.2f%% multiplier',
+                $data['prorated_days'],
+                $data['proration_start_date']->format('Y-m-d'),
+                $data['proration_end_date']->format('Y-m-d'),
+                ($data['proratio_multiplier'] ?? 0) * 100
+            );
+            $set('eligibility_message', $message);
+        } else {
+            $set('eligibility_message', '✓ Full month eligible (26 days)');
+        }
+
+        // Set all salary fields
         foreach ($data as $key => $value) {
-            if (!in_array($key, ['status', 'payout_type'])) {
+            if (!in_array($key, ['status', 'payout_type', 'is_prorated', 'proration_start_date', 
+                                'proration_end_date', 'prorated_days', 'proratio_multiplier', 'error'])) {
                 $set($key, $value);
             }
         }
@@ -95,6 +152,38 @@ class PayoutForm
                                         ->default(PayoutStatus::Draft)
                                         ->required(),
                                 ]),
+
+                            // Eligibility and Proration Info
+                            Section::make('Eligibility Status')
+                                ->columnSpanFull()
+                                ->schema([
+                                    TextInput::make('eligibility_message')
+                                        ->label('Status')
+                                        ->disabled()
+                                        ->helperText('Shows eligibility and proration details')
+                                        ->columnSpanFull(),
+
+                                    Toggle::make('is_prorated')
+                                        ->label('Is Prorated Salary?')
+                                        ->disabled()
+                                        ->hint('Auto-calculated based on joining/leaving dates and last paid date'),
+
+                                    DatePicker::make('proration_start_date')
+                                        ->label('Eligibility Start Date')
+                                        ->disabled()
+                                        ->columnSpan(1),
+
+                                    DatePicker::make('proration_end_date')
+                                        ->label('Eligibility End Date')
+                                        ->disabled()
+                                        ->columnSpan(1),
+
+                                    TextInput::make('prorated_days')
+                                        ->label('Eligible Days')
+                                        ->disabled()
+                                        ->numeric()
+                                        ->columnSpan(1),
+                                ]),
                         ]),
 
                     Wizard\Step::make('Attendance Summary')
@@ -127,6 +216,7 @@ class PayoutForm
                                 ->schema([
                                     Section::make('Earnings')
                                         ->columnSpan(1)
+                                        ->description('Note: All amounts are prorated if applicable')
                                         ->schema([
                                             TextInput::make('basic_salary')
                                                 ->label('Basic Salary')
@@ -155,6 +245,7 @@ class PayoutForm
 
                                     Section::make('Deductions')
                                         ->columnSpan(1)
+                                        ->description('Note: PF & ESI are prorated if applicable')
                                         ->schema([
                                             TextInput::make('pf')->label('PF')->numeric()->prefix('₹')->readOnly(),
                                             TextInput::make('esi')->label('ESI')->numeric()->prefix('₹')->readOnly(),
@@ -199,7 +290,8 @@ class PayoutForm
                                 ]),
                             Textarea::make('remarks')
                                 ->label('Remarks')
-                                ->columnSpanFull(),
+                                ->columnSpanFull()
+                                ->helperText('Add any notes about the payout (e.g., partial payment, adjustment reason)'),
                         ]),
                 ])->columnSpanFull()
             ]);

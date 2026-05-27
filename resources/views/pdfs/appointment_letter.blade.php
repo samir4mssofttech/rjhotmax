@@ -153,7 +153,7 @@
                 <tr>
                     <td style="width: 50%; text-align: left;">
                         <!-- Replace with your actual logo path -->
-                        <img src="{{ public_path('images/logo.png') }}" class="company-logo" alt="Logo">
+                        <img src="{{ public_path('images/rjlogo.png') }}" class="company-logo" alt="Logo">
                         <div style="font-weight: bold; font-size: 12px; margin-top: 5px;">{{ config('app.name') }}</div>
                     </td>
                     <td class="company-details">

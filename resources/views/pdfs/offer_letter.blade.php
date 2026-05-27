@@ -135,7 +135,7 @@
     <table class="header-table">
         <tr>
             <td class="logo-cell">
-                <img src="{{ public_path('images/logo.png') }}" class="logo-img" alt="RJ Logo">
+                <img src="{{ public_path('images/rjlogo.png') }}" class="logo-img" alt="RJ Logo">
             </td>
             <td class="company-info-cell">
                 <div class="company-name">RJ HOTMAX REALTY PVT LTD</div>
@@ -211,7 +211,7 @@
 
     <!-- Fixed Footer Address Bar -->
     <div class="footer-bar">
-        Plot No: GA -146, Flat No-204, Corner Stone, 2nd Floor, Niladri Vihar, Bhubaneswar-751016
+        Plot No: 146, Corner Stone, 3rd floor, Flat -302, Niladri Vihar, Chandrasekharpur Bhubaneswar-751021, Odisha
     </div>
 </body>
 

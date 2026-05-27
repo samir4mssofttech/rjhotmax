@@ -15,6 +15,7 @@ use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class PayoutsTable
@@ -51,6 +52,7 @@ class PayoutsTable
                     ->date(),
             ])
             ->filters([
+                TrashedFilter::make(),
                 SelectFilter::make('status')
                     ->options(PayoutStatus::class),
                 SelectFilter::make('employee_id')

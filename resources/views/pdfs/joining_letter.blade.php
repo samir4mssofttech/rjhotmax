@@ -114,7 +114,7 @@
     <table class="header-table">
         <tr>
             <td class="logo-cell">
-                <img src="{{ public_path('images/logo.png') }}" class="logo-img" alt="Company Logo">
+                <img src="{{ public_path('images/rjlogo.png') }}" class="logo-img" alt="Company Logo">
             </td>
             <td class="company-info-cell">
                 <div class="company-name">RJ HOTMAX REALTY PVT LTD</div>
