@@ -157,6 +157,19 @@ class EmployeeForm
                     ->required()
                     ->live(),
 
+                DatePicker::make('exit_date')
+                    ->label('Date of Exit')
+                    ->required()
+                    ->visible(fn(Get $get) => $get('employee_status') === EmployeeStatus::EXIT)
+                    ->columns(2),
+
+                Textarea::make('exit_reason')
+                    ->label('Reason for Exit / Termination')
+                    ->placeholder('Enter details regarding the resignation or termination...')
+                    ->required()
+                    ->visible(fn(Get $get) => $get('employee_status') === EmployeeStatus::EXIT)
+                    ->columns(2),
+                    
                 Toggle::make('is_active')
                     ->label('Verified')
                     ->default(false)
@@ -230,18 +243,7 @@ class EmployeeForm
                     ->formatStateUsing(fn($state) => $state ? \App\Helpers\CurrencyHelper::intToPercent((int) $state) : null)
                     ->visible(fn(Get $get) => $get('is_active')),
 
-                DatePicker::make('exit_date')
-                    ->label('Date of Exit')
-                    ->required()
-                    ->visible(fn(Get $get) => $get('employee_status') === EmployeeStatus::EXIT)
-                    ->columns(2),
 
-                Textarea::make('exit_reason')
-                    ->label('Reason for Exit / Termination')
-                    ->placeholder('Enter details regarding the resignation or termination...')
-                    ->required()
-                    ->visible(fn(Get $get) => $get('employee_status') === EmployeeStatus::EXIT)
-                    ->columnSpanFull(),
             ]);
     }
 }

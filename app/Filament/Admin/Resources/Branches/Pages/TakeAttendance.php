@@ -23,6 +23,8 @@ class TakeAttendance extends Page
 
     public string $date;
 
+    public string $search = '';
+
     public array $attendances = [];
 
     public array $shifts = [];
@@ -40,10 +42,23 @@ class TakeAttendance extends Page
         $this->loadAttendances();
     }
 
+    public function updatedSearch(): void
+    {
+        $this->loadAttendances();
+    }
+
     public function loadAttendances(): void
     {
         $employees = Employee::where('branch_id', $this->record->id)
             ->where('is_active', true)
+            ->where('employee_status', '!=', 'exit')
+            ->when($this->search !== '', function ($query) {
+                $query->where(function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%')
+                      ->orWhere('id', 'like', '%' . $this->search . '%')
+                      ->orWhere('id', $this->search);
+                });
+            })
             ->orderBy('name')
             ->get();
 
@@ -76,6 +91,12 @@ class TakeAttendance extends Page
         foreach ($this->attendances as $id => $attendance) {
             $this->attendances[$id]['status'] = $status;
         }
+    }
+
+    public function clearSearch(): void
+    {
+        $this->search = '';
+        $this->loadAttendances();
     }
 
     public function save(): void

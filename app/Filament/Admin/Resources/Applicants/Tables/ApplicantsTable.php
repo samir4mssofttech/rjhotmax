@@ -321,6 +321,19 @@ class ApplicantsTable
                                 // 1️⃣ Generate Employee Code
                                 $employeeCode = 'RJ' . str_pad($record->id, 5, '0', STR_PAD_LEFT);
 
+                                // --- 🆕 CALCULATION BLOCK START ---
+                                // Get raw salary from input (Assuming $data['salary'] is in Rupees)
+                                $rawSalary = (float) $data['salary'];
+
+                                $rawBasic = $rawSalary * 0.50;
+                                $rawHra = $rawSalary * 0.10;
+                                $rawConveyance = $rawSalary * 0.08;
+                                $rawMedical = $rawSalary * 0.20;
+                                $rawOther = $rawSalary * 0.12;
+                                $rawPf = $rawBasic * 0.12;
+                                $rawEsi = $rawSalary * 0.0075;
+                                // --- 🆕 CALCULATION BLOCK END ---
+
                                 // 2️⃣ Create Employee
                                 $member = Employee::create([
                                     'applicant_id' => $record->id,
@@ -330,7 +343,21 @@ class ApplicantsTable
                                     'email' => $record->email_id,
                                     'phone' => $record->mobile_number,
                                     'join_date' => $data['date_of_joining'],
-                                    'salary' => CurrencyHelper::rupeeToPaisa($data['salary']),
+                                    // 'salary' => CurrencyHelper::rupeeToPaisa($data['salary']),
+                                    // CTC
+                                    'salary' => CurrencyHelper::rupeeToPaisa($rawSalary),
+
+                                    // 🆕 Insert the calculated breakdowns converted to Paisa/Integer
+                                    'basic_salary' => CurrencyHelper::rupeeToPaisa($rawBasic),
+                                    'hra' => CurrencyHelper::rupeeToPaisa($rawHra),
+                                    'conveyance' => CurrencyHelper::rupeeToPaisa($rawConveyance),
+                                    'medical' => CurrencyHelper::rupeeToPaisa($rawMedical),
+                                    'other_allowances' => CurrencyHelper::rupeeToPaisa($rawOther),
+
+                                    // Use percentToInt for PF and ESI to match your Form's dehydrateStateUsing logic
+                                    'pf' => CurrencyHelper::percentToInt($rawPf),
+                                    'esi' => CurrencyHelper::percentToInt($rawEsi),
+
                                     'confirmation_date' => $record->confirmation_date, // set on acceptance
                                     'exit_date' => null,
                                     'branch_id' => $data['branch_id'],
@@ -375,7 +402,7 @@ class ApplicantsTable
                                 // $token = Password::createToken($user);
                                 // $user->sendPasswordSetNotification($token);
                             });
-                            
+
                             // Send Notification instead of Mail
                             \Illuminate\Support\Facades\Notification::route('mail', $record->email_id)
                                 ->notify(new \App\Notifications\AppointmentLetterNotification($record));

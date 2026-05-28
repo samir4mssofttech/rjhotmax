@@ -24,7 +24,7 @@ class PayoutResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::CurrencyRupee;
 
-    protected static ?string $recordTitleAttribute = 'employee_id';
+    // protected static ?string $recordTitleAttribute = 'employee_id.name';
 
     public static function form(Schema $schema): Schema
     {
