@@ -34,6 +34,7 @@ class EmployeesTable
                 ImageColumn::make('profile_photo')
                     ->label('Photo')
                     ->circular()
+                    ->disk('public')
                     ->size(40),
                 TextColumn::make('name')
                     ->label('Name')

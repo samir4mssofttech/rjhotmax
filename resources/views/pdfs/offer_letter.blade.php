@@ -7,7 +7,8 @@
     <style>
         @page {
             size: A4;
-            margin: 0; /* Margin 0 to allow the footer to touch the bottom */
+            margin: 0;
+            /* Margin 0 to allow the footer to touch the bottom */
         }
 
         body {
@@ -16,7 +17,8 @@
             color: #000;
             line-height: 1.6;
             margin: 0;
-            padding: 20mm; /* Adding padding here instead of @page margin */
+            padding: 20mm;
+            /* Adding padding here instead of @page margin */
         }
 
         /* Header Styles */
@@ -43,7 +45,8 @@
         .company-name {
             font-size: 22px;
             font-weight: bold;
-            color: #000080; /* Dark Blue */
+            color: #000080;
+            /* Dark Blue */
             margin-bottom: 5px;
             text-transform: uppercase;
         }
@@ -114,7 +117,8 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background-color: #ffcc00; /* Yellowish color from image */
+            background-color: #ffcc00;
+            /* Yellowish color from image */
             color: #000;
             text-align: center;
             font-size: 12px;
@@ -126,6 +130,12 @@
         .logo-img {
             width: 120px;
             height: auto;
+        }
+
+        .signature-img {
+            width: 140px;
+            height: auto;
+            margin-bottom: -10px;
         }
     </style>
 </head>
@@ -166,21 +176,26 @@
     <!-- Main Content -->
     <div class="content">
         <p>
-            Congratulations! We are pleased to confirm that you have been selected to work for 
-            <span class="highlight">RJ HOTMAX REALTY PVT LTD</span>. We are delighted to make you the following job offer. 
-            The position we are offering you is that of <span class="highlight">{{ $applicant->designation }}</span> 
-            with a monthly cost to company <span class="highlight">INR {{ number_format($applicant->salary, 2) }}/-</span>.
+            Congratulations! We are pleased to confirm that you have been selected to work for
+            <span class="highlight">RJ HOTMAX REALTY PVT LTD</span>. We are delighted to make you the following job
+            offer.
+            The position we are offering you is that of <span
+                class="highlight">{{ ucwords(str_replace('_', ' ', $applicant->designation->value)) }}</span>
+            with a monthly cost to company <span class="highlight">INR
+                {{ number_format($applicant->salary, 2) }}/-</span>.
         </p>
 
         <p>
-            We would like you to start {{ $applicant->date_of_joining ? \Carbon\Carbon::parse($applicant->date_of_joining)->format('d/m/Y') : '[Date]' }} 
-            reporting at 10.00 AM. Please report to the managing director, for documentation and orientation. 
-            Please sign the enclosed copy of this letter and return it to me by {{ $applicant->date_of_joining ? \Carbon\Carbon::parse($applicant->date_of_joining)->format('d/m/Y') : '[Date]' }} 
+            We would like you to start
+            {{ $applicant->date_of_joining ? \Carbon\Carbon::parse($applicant->date_of_joining)->format('d/m/Y') : '[Date]' }}
+            reporting at 10.00 AM. Please report to the managing director, for documentation and orientation.
+            Please sign the enclosed copy of this letter and return it to me by
+            {{ $applicant->date_of_joining ? \Carbon\Carbon::parse($applicant->date_of_joining)->format('d/m/Y') : '[Date]' }}
             to indicate your acceptance of this offer.
         </p>
 
         <p>
-            We are confident you will be able to make a significant contribution to the success of our 
+            We are confident you will be able to make a significant contribution to the success of our
             RJ HOTMAX REALTY PVT LTD and look forward to working.
         </p>
     </div>
@@ -189,13 +204,18 @@
     <div class="signature-container">
         <p>Sincerely,</p>
         <p>RJ HOTMAX REALTY PVT LTD</p>
-        
+
         <table class="sig-table">
             <tr>
                 <td class="sig-box">
                     <div class="sig-line">
+
+                        <img src="{{ public_path('images/rjsign.jpeg') }}" alt="Signature" class="signature-img">
+
+                        <br>
+
                         __________________________<br>
-                        SUBRAT RANJAN JEN<br>
+                        SUBRAT RANJAN JENA<br>
                         AUTHORISED SIGNATORY
                     </div>
                 </td>

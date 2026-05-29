@@ -140,6 +140,13 @@
         .font-bold {
             font-weight: bold;
         }
+
+        .signature-img {
+            width: 140px;
+            height: auto;
+            margin-top: 10px;
+            margin-bottom: -10px;
+        }
     </style>
 </head>
 
@@ -232,9 +239,13 @@
             <div class="footer-section">
                 <p>With best wishes,</p>
                 <p>For <strong>{{ config('app.name') }}</strong></p>
-                <br><br>
-                <p><strong>Subrat Ranjan Jena</strong><br>
-                    Managing Director</p>
+
+                <img src="{{ public_path('images/rjsign.jpeg') }}" alt="Signature" class="signature-img">
+
+                <p>
+                    <strong>Subrat Ranjan Jena</strong><br>
+                    Managing Director
+                </p>
             </div>
 
             <div class="acceptance-section">
@@ -361,13 +372,13 @@
                     </tr> --}}
 
                     <!-- Final Calculation -->
-            <tr class="font-bold" style="background-color: #f9f9f9;">
-                <td>In Hand Salary Per Month</td>
-                <td class="text-right">
-                    {{-- Gross - PF - ESI --}}
-                    {{ number_format($applicant->salary - (($applicant->salary * 0.4) * 0.12) - ($applicant->salary * 0.0075), 0) }}/-
-                </td>
-            </tr>
+                    <tr class="font-bold" style="background-color: #f9f9f9;">
+                        <td>In Hand Salary Per Month</td>
+                        <td class="text-right">
+                            {{-- Gross - PF - ESI --}}
+                            {{ number_format($applicant->salary - $applicant->salary * 0.4 * 0.12 - $applicant->salary * 0.0075, 0) }}/-
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>

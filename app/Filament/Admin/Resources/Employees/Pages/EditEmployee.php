@@ -16,4 +16,11 @@ class EditEmployee extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return EmployeeResource::getUrl('view', [
+            'record' => $this->record,
+        ]);
+    }
 }

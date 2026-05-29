@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Employees\Schemas;
 
+use App\Enums\Designation;
 use App\Enums\EmployeeStatus;
 use App\Enums\ShiftType;
 use App\Helpers\CurrencyHelper;
@@ -11,13 +12,13 @@ use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Grid;
-use Filament\Forms\Components\TimePicker;
 
 class EmployeeForm
 {
@@ -34,6 +35,29 @@ class EmployeeForm
                 TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                DatePicker::make('dob')
+                    ->label('Date of Birth'),
+
+                Select::make('gender')
+                    ->label('Gender')
+                    ->native(false)
+                    ->options([
+                        'Male' => 'Male',
+                        'Female' => 'Female',
+                        'Other' => 'Other',
+                    ])
+                    ->searchable(),
+                TextInput::make('aadhar_number')
+                    ->label('Aadhar Number')
+                    ->mask('9999 9999 9999')
+                    ->placeholder('0000 0000 0000')
+                    ->required(),
+                TextInput::make('pan_number')
+                    ->label('PAN Number')
+                    ->placeholder('ABCDE1234F')
+                    ->maxLength(10)
+                    ->required(),
+
                 TextInput::make('email')
                     ->label('Email address')
                     ->email()
@@ -44,6 +68,39 @@ class EmployeeForm
                     ->tel()
                     ->required()
                     ->maxLength(20),
+                Select::make('designation')
+                    ->label('Designation')
+                    ->options(Designation::class)
+                    ->searchable()
+                    ->native(false)
+                    ->required(),
+
+                Select::make('skill_type')
+                    ->options([
+                        'Skilled' => 'Skilled',
+                        'Semi-Skilled' => 'Semi-Skilled',
+                        "Fully-Skilled" => "Fully-Skilled",
+                        'Unskilled' => 'Unskilled',
+                    ])
+                    ->native(false)
+                    ->required(),
+
+
+
+                TextInput::make('bank_account_number')
+                    ->label('Bank Account Number')
+                    ->maxLength(30),
+
+                TextInput::make('bank_name')
+                    ->label('Bank Name')
+                    ->maxLength(255),
+
+                TextInput::make('ifsc_code')
+                    ->label('IFSC Code')
+                    // ->uppercase()
+                    ->maxLength(20)
+                    ->placeholder('SBIN0001234'),
+
                 Select::make('branch_id')
                     ->relationship('branch', 'name')
                     ->getOptionLabelFromRecordUsing(fn($record) => $record->display_name)
@@ -77,15 +134,15 @@ class EmployeeForm
                     ->default(now())
                     ->required(),
 
-                Select::make('skill_type')
-                    ->options([
-                        'Skilled' => 'Skilled',
-                        'Semi-Skilled' => 'Semi-Skilled',
-                        "Fully-Skilled" => "Fully-Skilled",
-                        'Unskilled' => 'Unskilled',
-                    ])
+                Select::make('payout_type')
+                    ->label('Payout Type')
                     ->native(false)
-                    ->required(),
+                    ->options([
+                        'salaried' => 'Salaried(Monthly)',
+                        'day_worker' => 'Day Worker(Daily)',
+                    ])
+                    ->required()
+                    ->default(null),
 
                 // --- MODIFIED SALARY FIELD ---
                 TextInput::make('salary')
@@ -139,15 +196,6 @@ class EmployeeForm
                     ->default(0)
                     ->dehydrateStateUsing(fn($state) => \App\Helpers\CurrencyHelper::rupeeToPaisa((float) $state))
                     ->formatStateUsing(fn($state) => $state ? \App\Helpers\CurrencyHelper::paisaToRupee((int) $state) : null),
-                Select::make('payout_type')
-                    ->label('Payout Type')
-                    ->native(false)
-                    ->options([
-                        'salaried' => 'Salaried(Monthly)',
-                        'day_worker' => 'Day Worker(Daily)',
-                    ])
-                    ->required()
-                    ->default(null),
 
                 ToggleButtons::make('employee_status')
                     ->options(EmployeeStatus::class)
@@ -169,7 +217,7 @@ class EmployeeForm
                     ->required()
                     ->visible(fn(Get $get) => $get('employee_status') === EmployeeStatus::EXIT)
                     ->columns(2),
-                    
+
                 Toggle::make('is_active')
                     ->label('Verified')
                     ->default(false)
@@ -226,7 +274,6 @@ class EmployeeForm
                     ->dehydrateStateUsing(fn($state) => \App\Helpers\CurrencyHelper::rupeeToPaisa((float) $state))
                     ->formatStateUsing(fn($state) => $state ? \App\Helpers\CurrencyHelper::paisaToRupee((int) $state) : null)
                     ->visible(fn(Get $get) => $get('is_active')),
-
                 TextInput::make('pf')
                     ->helperText('12% of CTC. This amount will be deducted from the employee\'s salary and contributed to PF fund.')
                     ->prefix('₹')
@@ -243,6 +290,20 @@ class EmployeeForm
                     ->formatStateUsing(fn($state) => $state ? \App\Helpers\CurrencyHelper::intToPercent((int) $state) : null)
                     ->visible(fn(Get $get) => $get('is_active')),
 
+                TextInput::make('pf_number')
+                    ->label('PF Number')
+                    ->maxLength(255)
+                    ->visible(fn(Get $get) => $get('is_active')),
+
+                TextInput::make('esi_number')
+                    ->label('ESI Number')
+                    ->maxLength(255)
+                    ->visible(fn(Get $get) => $get('is_active')),
+
+                TextInput::make('uan_number')
+                    ->label('UAN Number')
+                    ->maxLength(255)
+                    ->visible(fn(Get $get) => $get('is_active')),
 
             ]);
     }

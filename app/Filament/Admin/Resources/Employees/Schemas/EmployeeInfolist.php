@@ -7,6 +7,7 @@ use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -25,6 +26,7 @@ class EmployeeInfolist
                                 ImageEntry::make('profile_photo')
                                     ->label('Profile Photo')
                                     ->circular()
+                                    ->disk('public')
                                     ->grow(false),
                                 TextEntry::make('name')
                                     ->weight('bold')
@@ -66,11 +68,39 @@ class EmployeeInfolist
                                 ]),
                             ]),
 
-                        // SECTION 3: Salary Breakdown
+                        Section::make('Legal & Banking Information')
+                            ->description('Government IDs and salary disbursement details')
+                            ->schema([
+                                Grid::make(3)->schema([
+                                    // Gov IDs
+                                    Group::make([
+                                        TextEntry::make('pan_number')->label('PAN Number')->copyable(),
+                                        TextEntry::make('aadhar_number')->label('Aadhar Number')->copyable(),
+                                        TextEntry::make('uan_number')->label('UAN Number')->copyable(),
+                                    ])->columnSpan(1),
+
+                                    // Bank Details
+                                    Group::make([
+                                        TextEntry::make('bank_name')->label('Bank Name'),
+                                        TextEntry::make('bank_account_number')->label('Account Number')->copyable(),
+                                        TextEntry::make('ifsc_code')->label('IFSC Code')->copyable(),
+                                    ])->columnSpan(1),
+
+                                    // Statutory IDs
+                                    Group::make([
+                                        TextEntry::make('pf_number')->label('PF Number'),
+                                        TextEntry::make('esi_number')->label('ESI Number'),
+                                    ])->columnSpan(1),
+                                ]),
+                            ]),
+
+                        // ══════════════════════════════════════════════════════════════
+                        // FINANCIAL BREAKDOWN
+                        // ══════════════════════════════════════════════════════════════
                         Section::make('Compensation & Benefits')
                             ->columnSpanFull()
                             ->schema([
-                                Grid::make(4)->schema([
+                                Grid::make(5)->schema([
                                     TextEntry::make('salary')
                                         ->label('Total CTC')
                                         ->weight('bold')
@@ -98,6 +128,14 @@ class EmployeeInfolist
                                         ->label('Other Allowances')
                                         ->money('INR', true)
                                         ->formatStateUsing(fn($state) => '₹' . \App\Helpers\CurrencyHelper::paisaToRupee((int) $state)),
+
+                                    TextEntry::make('pf_number')
+                                        ->label('PF Number')
+                                        ->color('info'),
+
+                                    TextEntry::make('esi_number')
+                                        ->label('ESI Number')
+                                        ->color('info'),
 
                                     TextEntry::make('pf')
                                         ->label('PF Contribution')

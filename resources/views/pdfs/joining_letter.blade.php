@@ -106,6 +106,16 @@
             width: 200px;
             height: auto;
         }
+
+        .signature-img {
+            width: 140px;
+            height: auto;
+            margin-bottom: -10px;
+        }
+
+        .authorized-signature {
+            margin-top: 10px;
+        }
     </style>
 </head>
 
@@ -151,7 +161,8 @@
         <p>Dear {{ $applicant->applicant_name }},</p>
 
         <p>With reference to your application and subsequent interview you had with us, we are pleased to offer you the
-            position of <strong>{{ $applicant->position->value ?? $applicant->position }}</strong> with RJ HOTMAX
+            position of <strong>{{ ucwords(str_replace('_', ' ', $applicant->designation->value)) }}</strong> with RJ
+            HOTMAX
             REALTY PVT LTD.</p>
 
         <p>The terms and conditions of your appointment are as follows:</p>
@@ -174,14 +185,23 @@
         <p>Please sign and return a duplicate copy of this letter as a token of your acceptance. We look forward to a
             mutually beneficial association.</p>
     </div>
-
+    <br>
+    <br>
     <!-- Sign Off -->
     <div class="signature-section">
         <p>Yours Sincerely,</p>
         <p>For <strong>RJ HOTMAX REALTY PVT LTD</strong></p>
         <br><br>
-        <p>__________________________<br>
-            (Authorized Signatory)</p>
+        <div class="authorized-signature">
+
+            <img src="{{ public_path('images/rjsign.jpeg') }}" alt="Signature" class="signature-img">
+
+            <br>
+
+            __________________________<br>
+            (Authorized Signatory)
+
+        </div>
     </div>
 
     <!-- Acceptance Section -->

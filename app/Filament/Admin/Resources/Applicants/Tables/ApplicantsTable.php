@@ -343,6 +343,18 @@ class ApplicantsTable
                                     'email' => $record->email_id,
                                     'phone' => $record->mobile_number,
                                     'join_date' => $data['date_of_joining'],
+                                    'designation' => $record->designation, // 👈 from applicant
+                                    'dob' => $record->date_of_birth,
+                                    //
+                                    'gender' => $record->gender,
+                                    'pan_number' => $record->pan_number,
+                                    'aadhar_number' => $record->aadhar_number,
+
+                                    'bank_account_number' => $record->bank_account_number,
+                                    'bank_name' => $record->bank_name,
+                                    'ifsc_code' => $record->bank_ifsc_code,
+
+                                    //
                                     // 'salary' => CurrencyHelper::rupeeToPaisa($data['salary']),
                                     // CTC
                                     'salary' => CurrencyHelper::rupeeToPaisa($rawSalary),
