@@ -26,6 +26,8 @@ class PayoutResource extends Resource
 
     // protected static ?string $recordTitleAttribute = 'employee_id.name';
 
+    protected static ?int $navigationSort = 3;
+
     public static function form(Schema $schema): Schema
     {
         return PayoutForm::configure($schema);

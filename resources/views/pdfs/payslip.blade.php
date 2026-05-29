@@ -1,57 +1,74 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
 
-<style>
+    <style>
         @page {
             size: A4;
             margin: 0;
         }
-        body { 
-            font-family: 'Helvetica', sans-serif; 
-            font-size: 12px; 
-            color: #000; 
-            margin: 0; 
-            padding: 15mm 20mm; 
+
+        body {
+            font-family: 'Helvetica', sans-serif;
+            font-size: 12px;
+            color: #000;
+            margin: 0;
+            padding: 15mm 20mm;
         }
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .bold { font-weight: bold; }
-        
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
         /* Header Styles - Matching Offer Letter */
-        .header-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-bottom: 20px; 
-            border-bottom: 2px solid #000; 
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000;
             padding-bottom: 10px;
         }
-        .logo-cell { 
-            width: 30%; 
-            text-align: left; 
-            vertical-align: middle; 
+
+        .logo-cell {
+            width: 30%;
+            text-align: left;
+            vertical-align: middle;
         }
-        .company-info-cell { 
-            width: 70%; 
-            text-align: left; 
-            vertical-align: middle; 
+
+        .company-info-cell {
+            width: 70%;
+            text-align: left;
+            vertical-align: middle;
         }
-        .company-name { 
-            font-size: 20px; 
-            font-weight: bold; 
-            color: #000080; /* Dark Blue from Offer Letter */
-            text-transform: uppercase; 
+
+        .company-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #000080;
+            /* Dark Blue from Offer Letter */
+            text-transform: uppercase;
             margin-bottom: 5px;
         }
-        .company-details { 
-            font-size: 10px; 
-            font-weight: bold; 
+
+        .company-details {
+            font-size: 10px;
+            font-weight: bold;
             line-height: 1.3;
         }
-        .logo-img { 
-            width: 120px; 
-            height: auto; 
+
+        .logo-img {
+            width: 120px;
+            height: auto;
         }
 
         .document-title {
@@ -63,25 +80,81 @@
             text-transform: uppercase;
         }
 
-        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .info-table td { padding: 4px 0; vertical-align: top; font-size: 12px; }
-        .label { color: #555; font-weight: bold; }
-
-        .salary-table { width: 100%; border-collapse: collapse; border: 1px solid #000; }
-        .salary-table th, .salary-table td { 
-            border: 1px solid #000; 
-            padding: 8px; 
-            text-align: left; 
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
-        .salary-table th { background-color: #f2f2f2; font-weight: bold; }
-        .amount-col { text-align: right !important; width: 25%; }
-        
-        .footer-table { width: 100%; border-collapse: collapse; border: 1px solid #000; margin-top: 0; }
-        .footer-table td { border: 1px solid #000; padding: 8px; }
 
-        .signature-section { margin-top: 40px; width: 100%; }
-        .signature-box { width: 200px; text-align: center; float: right; }
-        .signature-line { border-top: 1px solid #000; margin-bottom: 5px; font-weight: bold; font-size: 12px; }
+        .info-table td {
+            padding: 4px 0;
+            vertical-align: top;
+            font-size: 12px;
+        }
+
+        .label {
+            color: #555;
+            font-weight: bold;
+        }
+
+        .salary-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #000;
+        }
+
+        .salary-table th,
+        .salary-table td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .salary-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .amount-col {
+            text-align: right !important;
+            width: 25%;
+        }
+
+        .footer-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #000;
+            margin-top: 0;
+        }
+
+        .footer-table td {
+            border: 1px solid #000;
+            padding: 8px;
+        }
+
+        .signature-section {
+            margin-top: 40px;
+            width: 100%;
+        }
+
+        .signature-box {
+            width: 200px;
+            text-align: center;
+            float: right;
+        }
+
+        .signature-line {
+            border-top: 1px solid #000;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .signature-img {
+            width: 140px;
+            height: auto;
+            margin-bottom: -10px;
+        }
 
         /* Matching the Yellow Footer Bar from Offer Letter */
         .footer-bar {
@@ -89,7 +162,7 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background-color: #ffcc00; 
+            background-color: #ffcc00;
             color: #000;
             text-align: center;
             font-size: 11px;
@@ -97,8 +170,9 @@
             padding: 10px 0;
             border-top: 2px solid #000;
         }
-</style>
+    </style>
 </head>
+
 <body>
 
     <!-- Header Section (Updated to RJ HOTMAX) -->
@@ -125,36 +199,55 @@
     <!-- Employee Information -->
     <table class="info-table">
         <tr>
-            <td width="15%" class="label">Emp ID</td><td width="35%">{{ $employee->account_number ?? $employee->account_no ?? 'N/A' }}</td>
-            <td width="15%" class="label">Employee Name:</td><td width="35%">{{ $employee->name }}</td>
+            <td width="15%" class="label">Emp ID</td>
+            <td width="35%">{{ $employee->account_number ?? ($employee->account_no ?? 'N/A') }}</td>
+            <td width="15%" class="label">Employee Name:</td>
+            <td width="35%">{{ $employee->name }}</td>
         </tr>
         <tr>
-            <td class="label">PF. No.</td><td>{{ $employee->pf_number ?? 'N/A' }}</td>
-            <td class="label">ESI No.</td><td>{{ $employee->esi_number ?? 'N/A' }}</td>
+            <td class="label">PF. No.</td>
+            <td>{{ $employee->pf_number ?? 'N/A' }}</td>
+            <td class="label">ESI No.</td>
+            <td>{{ $employee->esi_number ?? 'N/A' }}</td>
         </tr>
         <tr>
-            <td class="label">NOD</td><td>{{ $employee->nod ?? '31' }}</td>
-            <td class="label">NDP</td><td>{{ $employee->ndp ?? '31' }}</td>
+            <td class="label">NOD</td>
+            <td>{{ $nod }}</td>
+
+            <td class="label">NDP</td>
+            <td>{{ $ndp }}</td>
         </tr>
         <tr>
-            <td class="label">DOJ</td><td>{{ $employee->join_date ?? 'N/A' }}</td>
-            <td class="label">Designation</td><td>{{ $employee->designation ?? 'Accountant' }}</td>
+            <td class="label">DOJ</td>
+            <td>{{ $employee->join_date ? \Carbon\Carbon::parse($employee->join_date)->format('d-m-Y') : 'N/A' }}</td>
+            <td class="label">Designation</td>
+            <td>
+                {{ ucwords(str_replace('_', ' ', $employee->designation ?? 'Accountant')) }}
+            </td>
         </tr>
         <tr>
-            <td class="label">Department</td><td>{{ $employee->department ?? 'N/A' }}</td>
-            {{-- <td class="label">A/c No</td><td>{{ $employee->account_number ?? $employee->account_no ?? 'N/A' }}</td> --}}
+            <td class="label">A/c No</td>
+            <td>{{ $employee->bank_account_number ?? ($employee->bank_account_number ?? 'N/A') }}</td>
+            <td class="label">Bank Name</td>
+            <td>{{ $employee->bank_name ?? 'N/A' }}</td>
         </tr>
         <tr>
-            <td class="label">PAN</td><td>{{ $employee->pan ?? 'N/A' }}</td>
-            <td class="label">DOB</td><td>{{ $employee->dob ?? 'N/A' }}</td>
+            <td class="label">PAN</td>
+            <td>{{ $employee->pan_number ?? 'N/A' }}</td>
+            <td class="label">DOB</td>
+            <td>{{ $employee->dob ?? 'N/A' }}</td>
         </tr>
         <tr>
-            <td class="label">UAN</td><td>{{ $employee->uan ?? 'N/A' }}</td>
-            <td class="label">LOP Days</td><td>{{ $employee->lop_days ?? '0' }}</td>
+            <td class="label">UAN</td>
+            <td>{{ $employee->uan_number ?? 'N/A' }}</td>
+            <td class="label">LOP</td>
+            <td>{{ number_format($lop,2) }}</td>
         </tr>
         <tr>
-            <td class="label">Aadhar No</td><td>{{ $employee->aadhar ?? 'N/A' }}</td>
-            <td class="label">Remarks</td><td>{{ $employee->remarks ?? '' }}</td>
+            <td class="label">Aadhar No</td>
+            <td>{{ $employee->aadhar_number ?? 'N/A' }}</td>
+            <td class="label">Remarks</td>
+            <td>{{ $employee->remarks ?? 'N/A' }}</td>
         </tr>
     </table>
 
@@ -169,15 +262,17 @@
             </tr>
         </thead>
         <tbody>
-            @php 
-                $maxRows = max(count($earnings), count($deductions)); 
+            @php
+                $maxRows = max(count($earnings), count($deductions));
             @endphp
-            @for($i = 0; $i < $maxRows; $i++)
+            @for ($i = 0; $i < $maxRows; $i++)
                 <tr>
                     <td>{{ $earnings[$i]['label'] ?? '' }}</td>
-                    <td class="amount-col">{{ isset($earnings[$i]) ? number_format($earnings[$i]['amount'], 2) : '' }}</td>
+                    <td class="amount-col">{{ isset($earnings[$i]) ? number_format($earnings[$i]['amount'], 2) : '' }}
+                    </td>
                     <td>{{ $deductions[$i]['label'] ?? '' }}</td>
-                    <td class="amount-col">{{ isset($deductions[$i]) ? number_format($deductions[$i]['amount'], 2) : '' }}</td>
+                    <td class="amount-col">
+                        {{ isset($deductions[$i]) ? number_format($deductions[$i]['amount'], 2) : '' }}</td>
                 </tr>
             @endfor
             <tr class="bold">
@@ -205,11 +300,15 @@
     <!-- Signature Section -->
     <div class="signature-section">
         <div class="signature-box">
+
+            <img src="{{ public_path('images/rjsign.jpeg') }}" alt="Signature" class="signature-img">
+
             <div class="signature-line">
                 __________________________<br>
                 SUBRAT RANJAN JEN<br>
                 AUTHORISED SIGNATORY
             </div>
+
         </div>
     </div>
 
@@ -219,4 +318,5 @@
     </div>
 
 </body>
+
 </html>
