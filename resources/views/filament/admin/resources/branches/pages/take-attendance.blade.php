@@ -194,11 +194,16 @@
                                         @php
                                             $statusConfig = [
                                                 'present' => ['label' => 'Present', 'title' => 'Present', 'bg' => 'bg-emerald-500', 'ring' => 'ring-emerald-300 dark:ring-emerald-700', 'inactive' => 'bg-gray-100 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-emerald-500/10 dark:hover:text-emerald-400'],
+
                                                 'absent' => ['label' => 'Absent', 'title' => 'Absent', 'bg' => 'bg-red-500', 'ring' => 'ring-red-300 dark:ring-red-700', 'inactive' => 'bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-red-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-red-500/10 dark:hover:text-red-400'],
-                                                'half_day' => ['label' => 'Half Day', 'title' => 'Half Day', 'bg' => 'bg-blue-500', 'ring' => 'ring-blue-300 dark:ring-blue-700', 'inactive' => 'bg-gray-100 text-gray-500 hover:bg-blue-50 hover:text-blue-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-blue-500/10 dark:hover:text-blue-400'],
-                                                'on_leave' => ['label' => 'On Leave', 'title' => 'On Leave', 'bg' => 'bg-amber-500', 'ring' => 'ring-amber-300 dark:ring-amber-700', 'inactive' => 'bg-gray-100 text-gray-500 hover:bg-amber-50 hover:text-amber-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-amber-500/10 dark:hover:text-amber-400'],
-                                                'holiday' => ['label' => 'Holiday', 'title' => 'Holiday', 'bg' => 'bg-cyan-500', 'ring' => 'ring-cyan-300 dark:ring-cyan-700', 'inactive' => 'bg-gray-100 text-gray-500 hover:bg-cyan-50 hover:text-cyan-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-cyan-500/10 dark:hover:text-cyan-400'],
-                                                'weekly_off' => ['label' => 'Weekly Off', 'title' => 'Weekly Off', 'bg' => 'bg-gray-500', 'ring' => 'ring-gray-300 dark:ring-gray-600', 'inactive' => 'bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'],
+
+                                                // 'half_day' => ['label' => 'Half Day', 'title' => 'Half Day', 'bg' => 'bg-blue-500', 'ring' => 'ring-blue-300 dark:ring-blue-700', 'inactive' => 'bg-gray-100 text-gray-500 hover:bg-blue-50 hover:text-blue-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-blue-500/10 dark:hover:text-blue-400'],
+
+                                                // 'on_leave' => ['label' => 'On Leave', 'title' => 'On Leave', 'bg' => 'bg-amber-500', 'ring' => 'ring-amber-300 dark:ring-amber-700', 'inactive' => 'bg-gray-100 text-gray-500 hover:bg-amber-50 hover:text-amber-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-amber-500/10 dark:hover:text-amber-400'],
+
+                                                // 'holiday' => ['label' => 'Holiday', 'title' => 'Holiday', 'bg' => 'bg-cyan-500', 'ring' => 'ring-cyan-300 dark:ring-cyan-700', 'inactive' => 'bg-gray-100 text-gray-500 hover:bg-cyan-50 hover:text-cyan-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-cyan-500/10 dark:hover:text-cyan-400'],
+
+                                                // 'weekly_off' => ['label' => 'Weekly Off', 'title' => 'Weekly Off', 'bg' => 'bg-gray-500', 'ring' => 'ring-gray-300 dark:ring-gray-600', 'inactive' => 'bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'],
                                             ];
                                         @endphp
                                         @foreach ($statusConfig as $statusValue => $config)

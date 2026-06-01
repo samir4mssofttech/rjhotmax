@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Mattiverse\Userstamps\Traits\Userstamps;
+use Illuminate\Database\Eloquent\Factories\HasFactory; // ← add this
 
 class Branch extends Model
 {
-    use SoftDeletes, Userstamps;
+    use SoftDeletes, Userstamps, HasFactory;
 
     protected $fillable = [
         'name',

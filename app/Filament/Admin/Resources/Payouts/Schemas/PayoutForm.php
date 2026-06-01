@@ -3,7 +3,7 @@
 namespace App\Filament\Admin\Resources\Payouts\Schemas;
 
 use App\Enums\PayoutStatus;
-use App\Enums\PayoutType;
+
 use App\Models\Employee;
 use App\Models\Payout;
 use Filament\Forms\Components\DatePicker;
@@ -24,78 +24,116 @@ class PayoutForm
     protected static function recalculate(Get $get, Set $set): void
     {
         $employeeId = $get('employee_id');
-        $month = $get('payout_month');
+        $month      = $get('payout_month');
 
         if (!$employeeId || !$month || !preg_match('/^\d{4}-\d{2}$/', $month)) {
-            $set('eligibility_message', null);
-            $set('is_prorated', false);
-            $set('proration_start_date', null);
-            $set('proration_end_date', null);
-            $set('prorated_days', null);
+            self::clearFields($set);
             return;
         }
 
         $employee = Employee::find($employeeId);
         if (!$employee) return;
 
-        // Calculate eligibility first
+        $isDaily = $employee->payout_type === 'day_worker';
+
+        // Check eligibility
         $eligibility = Payout::calculateEligibilityPeriod($employee, $month);
-        
-        // Check if eligible
+
         if ($eligibility['eligible_days'] === 0 && $eligibility['reason']) {
             $set('eligibility_message', '⚠️ ' . $eligibility['reason']);
-            $set('is_prorated', true);
+            $set('is_prorated', false);
             $set('proration_start_date', $eligibility['start_date']);
             $set('proration_end_date', $eligibility['end_date']);
             $set('prorated_days', 0);
-            
-            // Clear all salary fields
-            $data = Payout::calculateForEmployee($employee, $month);
-            if (isset($data['error'])) {
-                foreach (['basic_salary', 'hra', 'conveyance', 'medical', 'other_allowances', 
-                         'overtime_amount', 'gross_salary', 'pf', 'esi', 'absent_deduction', 
-                         'late_deduction', 'other_deductions', 'total_deductions', 'net_salary',
-                         'total_working_days', 'present_days', 'absent_days', 'late_days', 'overtime_minutes'] as $field) {
-                    $set($field, null);
-                }
-            }
+            self::clearSalaryFields($set);
             return;
         }
 
-        // Calculate salary with proration
+        // Run the appropriate calculation
         $data = Payout::calculateForEmployee($employee, $month);
 
         if (isset($data['error'])) {
             $set('eligibility_message', '❌ ' . $data['error']);
+            self::clearSalaryFields($set);
             return;
         }
 
-        // Set proration info
-        $set('is_prorated', $data['is_prorated'] ?? false);
-        $set('proration_start_date', $data['proration_start_date']);
-        $set('proration_end_date', $data['proration_end_date']);
-        $set('prorated_days', $data['prorated_days']);
+        // ── Proration / eligibility status message ──────────────────
+        if ($isDaily) {
+            // Daily workers: show eligible period (joining_date → month_end) and days present
+            $set('is_prorated', false);
+            $set('proration_start_date', $data['proration_start_date']);
+            $set('proration_end_date', $data['proration_end_date']);
+            $set('prorated_days', $data['prorated_days']);  // calendar days in eligible period
 
-        // Set eligibility message
-        if ($data['is_prorated']) {
-            $message = sprintf(
-                '✓ Prorated Salary: %d days (%s to %s) with %.2f%% multiplier',
+            $set('eligibility_message', sprintf(
+                '✓ Daily Worker — Eligible: %s to %s (%d days) | Present: %d days | Daily wage: ₹%s',
+                $data['proration_start_date']->format('d M Y'),
+                $data['proration_end_date']->format('d M Y'),
                 $data['prorated_days'],
-                $data['proration_start_date']->format('Y-m-d'),
-                $data['proration_end_date']->format('Y-m-d'),
-                ($data['proratio_multiplier'] ?? 0) * 100
-            );
-            $set('eligibility_message', $message);
+                $data['present_days'],
+                number_format($data['_daily_wage_rupee'] ?? 0, 2)
+            ));
         } else {
-            $set('eligibility_message', '✓ Full month eligible (26 days)');
+            // Monthly workers: show proration details if applicable
+            $set('is_prorated', $data['is_prorated'] ?? false);
+            $set('proration_start_date', $data['proration_start_date']);
+            $set('proration_end_date', $data['proration_end_date']);
+            $set('prorated_days', $data['prorated_days']);
+
+            if ($data['is_prorated']) {
+                $set('eligibility_message', sprintf(
+                    '✓ Prorated Salary: %d working days (%s to %s) | Multiplier: %.2f%%',
+                    $data['prorated_days'],
+                    $data['proration_start_date']->format('d M Y'),
+                    $data['proration_end_date']->format('d M Y'),
+                    ($data['proratio_multiplier'] ?? 0) * 100
+                ));
+            } else {
+                $set('eligibility_message', sprintf(
+                    '✓ Full month eligible — %d working days | Per-day rate: ₹%s',
+                    $data['total_working_days'],
+                    number_format($data['_per_day_rate_rupee'] ?? 0, 2)
+                ));
+            }
         }
 
-        // Set all salary fields
+        // ── Push all salary fields to form ─────────────────────────
+        $skip = [
+            'status', 'payout_type', 'is_prorated',
+            'proration_start_date', 'proration_end_date',
+            'prorated_days', 'proratio_multiplier', 'error',
+            '_calendar_days', '_per_day_rate_rupee',
+            '_daily_wage_rupee', '_holiday_count',
+        ];
+
         foreach ($data as $key => $value) {
-            if (!in_array($key, ['status', 'payout_type', 'is_prorated', 'proration_start_date', 
-                                'proration_end_date', 'prorated_days', 'proratio_multiplier', 'error'])) {
+            if (!in_array($key, $skip)) {
                 $set($key, $value);
             }
+        }
+    }
+
+    // ── Clear all computed fields ───────────────────────────────────
+    protected static function clearFields(Set $set): void
+    {
+        $set('eligibility_message', null);
+        $set('is_prorated', false);
+        $set('proration_start_date', null);
+        $set('proration_end_date', null);
+        $set('prorated_days', null);
+        self::clearSalaryFields($set);
+    }
+
+    protected static function clearSalaryFields(Set $set): void
+    {
+        foreach ([
+            'basic_salary', 'hra', 'conveyance', 'medical', 'other_allowances',
+            'overtime_amount', 'gross_salary', 'pf', 'esi', 'absent_deduction',
+            'late_deduction', 'other_deductions', 'total_deductions', 'net_salary',
+            'total_working_days', 'present_days', 'absent_days', 'late_days', 'overtime_minutes',
+        ] as $field) {
+            $set($field, null);
         }
     }
 
@@ -104,6 +142,8 @@ class PayoutForm
         return $schema
             ->components([
                 Wizard::make([
+
+                    // ── Step 1: Selection ───────────────────────────────────
                     Wizard\Step::make('Payout Selection')
                         ->icon('heroicon-o-document-text')
                         ->schema([
@@ -121,10 +161,7 @@ class PayoutForm
                                         ->label('Employee')
                                         ->relationship('employee', 'name', function ($query, Get $get) {
                                             $branchId = $get('branch_id');
-
-                                            // Show only active employees
                                             $query->where('is_active', true);
-
                                             if ($branchId) {
                                                 $query->where('branch_id', $branchId);
                                             }
@@ -133,18 +170,14 @@ class PayoutForm
                                         ->preload()
                                         ->required()
                                         ->live()
-                                        ->afterStateUpdated(function (Get $get, Set $set) {
-                                            self::recalculate($get, $set);
-                                        }),
+                                        ->afterStateUpdated(fn(Get $get, Set $set) => self::recalculate($get, $set)),
 
                                     TextInput::make('payout_month')
                                         ->label('Month (YYYY-MM)')
                                         ->placeholder('2026-01')
                                         ->required()
                                         ->live()
-                                        ->afterStateUpdated(function (Get $get, Set $set) {
-                                            self::recalculate($get, $set);
-                                        }),
+                                        ->afterStateUpdated(fn(Get $get, Set $set) => self::recalculate($get, $set)),
 
                                     Select::make('status')
                                         ->label('Status')
@@ -153,20 +186,37 @@ class PayoutForm
                                         ->required(),
                                 ]),
 
-                            // Eligibility and Proration Info
+                            // Eligibility & Proration Info
                             Section::make('Eligibility Status')
                                 ->columnSpanFull()
                                 ->schema([
                                     TextInput::make('eligibility_message')
                                         ->label('Status')
                                         ->disabled()
-                                        ->helperText('Shows eligibility and proration details')
+                                        ->helperText(function (Get $get): string {
+                                            $employeeId = $get('employee_id');
+                                            if (!$employeeId) {
+                                                return 'Select an employee and month to see eligibility details.';
+                                            }
+                                            $employee = Employee::find($employeeId);
+                                            if (!$employee) return 'Employee not found.';
+
+                                            return $employee->payout_type === 'day_worker'
+                                                ? 'Daily worker: paid per day present. Holidays & Sundays are unpaid rest days.'
+                                                : 'Monthly worker: full salary minus absent deductions. Holidays & Sundays are paid rest days.';
+                                        })
                                         ->columnSpanFull(),
 
                                     Toggle::make('is_prorated')
                                         ->label('Is Prorated Salary?')
                                         ->disabled()
-                                        ->hint('Auto-calculated based on joining/leaving dates and last paid date'),
+                                        ->hint('Auto-set for monthly workers who join/leave mid-month')
+                                        ->visible(function (Get $get): bool {
+                                            $employeeId = $get('employee_id');
+                                            if (!$employeeId) return false;
+                                            $employee = Employee::find($employeeId);
+                                            return $employee?->payout_type !== 'day_worker';
+                                        }),
 
                                     DatePicker::make('proration_start_date')
                                         ->label('Eligibility Start Date')
@@ -179,13 +229,21 @@ class PayoutForm
                                         ->columnSpan(1),
 
                                     TextInput::make('prorated_days')
-                                        ->label('Eligible Days')
+                                        ->label(function (Get $get): string {
+                                            $employeeId = $get('employee_id');
+                                            if (!$employeeId) return 'Eligible Days';
+                                            $employee = Employee::find($employeeId);
+                                            return $employee?->payout_type === 'day_worker'
+                                                ? 'Eligible Worked Days(Daily)'
+                                                : 'Eligible Working Days(Monthly)';
+                                        })
                                         ->disabled()
                                         ->numeric()
                                         ->columnSpan(1),
                                 ]),
                         ]),
 
+                    // ── Step 2: Attendance ──────────────────────────────────
                     Wizard\Step::make('Attendance Summary')
                         ->icon('heroicon-o-calendar')
                         ->schema([
@@ -193,12 +251,14 @@ class PayoutForm
                                 ->schema([
                                     TextInput::make('total_working_days')
                                         ->label('Working Days')
+                                        ->helperText('Excl. Sundays & holidays')
                                         ->numeric()->readOnly(),
                                     TextInput::make('present_days')
                                         ->label('Present')
                                         ->numeric()->readOnly(),
                                     TextInput::make('absent_days')
                                         ->label('Absent')
+                                        ->helperText('On working days only')
                                         ->numeric()->readOnly(),
                                     TextInput::make('late_days')
                                         ->label('Late Days')
@@ -209,6 +269,7 @@ class PayoutForm
                                 ]),
                         ]),
 
+                    // ── Step 3: Earnings & Deductions ───────────────────────
                     Wizard\Step::make('Earnings & Deductions')
                         ->icon('heroicon-o-currency-rupee')
                         ->schema([
@@ -216,27 +277,30 @@ class PayoutForm
                                 ->schema([
                                     Section::make('Earnings')
                                         ->columnSpan(1)
-                                        ->description('Note: All amounts are prorated if applicable')
+                                        ->description(function (Get $get): string {
+                                            $employeeId = $get('employee_id');
+                                            if (!$employeeId) return '';
+                                            $employee = Employee::find($employeeId);
+                                            return $employee?->payout_type === 'day_worker'
+                                                ? 'Daily worker: amounts = daily_wage × days present'
+                                                : 'Monthly worker: amounts are prorated if applicable';
+                                        })
                                         ->schema([
                                             TextInput::make('basic_salary')
-                                                ->label('Basic Salary')
-                                                ->numeric()->prefix('₹')
-                                                ->readOnly(),
-                                            TextInput::make('hra')
-                                                ->label('HRA')->numeric()
-                                                ->prefix('₹')->readOnly(),
-                                            TextInput::make('conveyance')
-                                                ->label('Conveyance')->numeric()
-                                                ->prefix('₹')->readOnly(),
-                                            TextInput::make('medical')
-                                                ->label('Medical')->numeric()
-                                                ->prefix('₹')->readOnly(),
-                                            TextInput::make('other_allowances')
-                                                ->label('Other Allowances')->numeric()
-                                                ->prefix('₹')->readOnly(),
-                                            TextInput::make('overtime_amount')
-                                                ->label('Overtime Amount')->numeric()
-                                                ->prefix('₹')->readOnly(),
+                                                ->label(function (Get $get): string {
+                                                    $employeeId = $get('employee_id');
+                                                    if (!$employeeId) return 'Basic Salary';
+                                                    $employee = Employee::find($employeeId);
+                                                    return $employee?->payout_type === 'day_worker'
+                                                        ? 'Basic (Daily Wage × Present Days)'
+                                                        : 'Basic Salary';
+                                                })
+                                                ->numeric()->prefix('₹')->readOnly(),
+                                            TextInput::make('hra')->label('HRA')->numeric()->prefix('₹')->readOnly(),
+                                            TextInput::make('conveyance')->label('Conveyance')->numeric()->prefix('₹')->readOnly(),
+                                            TextInput::make('medical')->label('Medical')->numeric()->prefix('₹')->readOnly(),
+                                            TextInput::make('other_allowances')->label('Other Allowances')->numeric()->prefix('₹')->readOnly(),
+                                            TextInput::make('overtime_amount')->label('Overtime Amount')->numeric()->prefix('₹')->readOnly(),
                                             TextInput::make('gross_salary')
                                                 ->label('Gross Salary')
                                                 ->numeric()->prefix('₹')->readOnly()
@@ -245,11 +309,28 @@ class PayoutForm
 
                                     Section::make('Deductions')
                                         ->columnSpan(1)
-                                        ->description('Note: PF & ESI are prorated if applicable')
+                                        ->description(function (Get $get): string {
+                                            $employeeId = $get('employee_id');
+                                            if (!$employeeId) return '';
+                                            $employee = Employee::find($employeeId);
+                                            return $employee?->payout_type === 'day_worker'
+                                                ? 'Daily worker: no absent deduction (unpaid days already excluded from earnings)'
+                                                : 'Monthly worker: PF & ESI are prorated if applicable';
+                                        })
                                         ->schema([
                                             TextInput::make('pf')->label('PF')->numeric()->prefix('₹')->readOnly(),
                                             TextInput::make('esi')->label('ESI')->numeric()->prefix('₹')->readOnly(),
-                                            TextInput::make('absent_deduction')->label('Absent Deduction')->numeric()->prefix('₹')->readOnly(),
+                                            TextInput::make('absent_deduction')
+                                                ->label('Absent Deduction')
+                                                ->numeric()->prefix('₹')->readOnly()
+                                                ->helperText(function (Get $get): string {
+                                                    $employeeId = $get('employee_id');
+                                                    if (!$employeeId) return '';
+                                                    $employee = Employee::find($employeeId);
+                                                    return $employee?->payout_type === 'day_worker'
+                                                        ? 'N/A — daily workers are not paid for absent days'
+                                                        : 'absent_days × (monthly_salary ÷ calendar_days)';
+                                                }),
                                             TextInput::make('late_deduction')->label('Late Deduction')->numeric()->prefix('₹')->readOnly(),
                                             TextInput::make('other_deductions')
                                                 ->label('Other Deductions')
@@ -272,6 +353,7 @@ class PayoutForm
                                 ]),
                         ]),
 
+                    // ── Step 4: Net Pay & Payment ───────────────────────────
                     Wizard\Step::make('Net Pay & Payment')
                         ->icon('heroicon-o-check-circle')
                         ->schema([
@@ -284,7 +366,7 @@ class PayoutForm
                                         ->extraInputAttributes(['class' => 'text-2xl font-black text-primary-600 dark:text-primary-400']),
                                     Select::make('payout_type')
                                         ->label('Payment Mode')
-                                        ->options(PayoutType::class),
+                                        ->options(['salaried' => 'Salaried (Monthly)', 'day_worker' => 'Day Worker (Daily)']),
                                     DatePicker::make('paid_on')
                                         ->label('Paid On'),
                                 ]),
@@ -293,6 +375,7 @@ class PayoutForm
                                 ->columnSpanFull()
                                 ->helperText('Add any notes about the payout (e.g., partial payment, adjustment reason)'),
                         ]),
+
                 ])->columnSpanFull()
             ]);
     }
