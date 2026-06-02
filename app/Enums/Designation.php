@@ -18,6 +18,7 @@ enum Designation: string implements HasColor, HasIcon, HasLabel
     case HELPER = 'helper';
     case DISH_WASHER = 'dish_washer';
     case SUPERVISOR = 'supervisor';
+    case MANAGER = 'manager';
 
     public function getColor(): string
     {
@@ -30,6 +31,7 @@ enum Designation: string implements HasColor, HasIcon, HasLabel
             self::HELPER => 'gray',
             self::DISH_WASHER => 'cyan',
             self::SUPERVISOR => 'success',
+            self::MANAGER => 'primary',
         };
     }
 
@@ -44,6 +46,7 @@ enum Designation: string implements HasColor, HasIcon, HasLabel
             self::HELPER => Heroicon::HandThumbUp,
             self::DISH_WASHER => Heroicon::OutlinedEyeDropper,
             self::SUPERVISOR => Heroicon::ShieldCheck,
+            self::MANAGER => Heroicon::Briefcase,
         };
     }
 
@@ -58,6 +61,7 @@ enum Designation: string implements HasColor, HasIcon, HasLabel
             self::HELPER => 'Helper',
             self::DISH_WASHER => 'Dish Washer',
             self::SUPERVISOR => 'Supervisor',
+            self::MANAGER => 'Manager',
         };
     }
 }

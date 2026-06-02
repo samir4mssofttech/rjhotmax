@@ -388,12 +388,12 @@ $absentDays           = max(0, $eligibleCalendarDays - $presentDays);
         // Combined daily wage (used for overtime + late deduction rate)
         $dailyWagePaisa = $dailyBasicPaisa + $dailyHraPaisa + $dailyConvPaisa + $dailyMedPaisa + $dailyOtherPaisa;
 
-        // Earnings = per_day_rate × days_actually_present
-        $basicEarned = round($dailyBasicPaisa * $presentDays, 2);
-        $hraEarned   = round($dailyHraPaisa   * $presentDays, 2);
-        $convEarned  = round($dailyConvPaisa  * $presentDays, 2);
-        $medEarned   = round($dailyMedPaisa   * $presentDays, 2);
-        $otherEarned = round($dailyOtherPaisa * $presentDays, 2);
+        // Earnings = The full monthly amounts shown exactly as they are in the employee table
+        $basicEarned = $monthlyBasicPaisa;
+        $hraEarned   = $monthlyHraPaisa;
+        $convEarned  = $monthlyConvPaisa;
+        $medEarned   = $monthlyMedPaisa;
+        $otherEarned = $monthlyOtherPaisa;
 
         $grossBeforeDeductions = $basicEarned + $hraEarned + $convEarned + $medEarned + $otherEarned;
 
@@ -403,17 +403,15 @@ $absentDays           = max(0, $eligibleCalendarDays - $presentDays);
         // Late deduction: first 3 late days free, half day's wage each after that
         $lateDeduction = round(($dailyWagePaisa / 2) * max(0, $lateDays - 3), 2);
 
-        // No absent_deduction for daily workers — they simply weren't paid for those days
-        $absentDeduction = 0;
+        // Absent deduction for daily workers — full days not present are deducted
+        $absentDeduction = round($dailyWagePaisa * $absentDays, 2);
 
-        // PF & ESI: monthly fixed amounts scaled by (present_days / calendar_days_in_month)
-        // If present_days = 0, ratio = 0 → no PF/ESI deducted (nothing earned, nothing deducted)
-        $presentRatio = $totalWorkingDays > 0 ? $presentDays / $totalWorkingDays : 0;
-        $pfEarned     = round(($employee->pf  ?? 0) * $presentRatio, 2);
-        $esiEarned    = round(($employee->esi ?? 0) * $presentRatio, 2);
+        // PF & ESI: full monthly amount so it matches employee table
+        $pfEarned     = $employee->pf ?? 0;
+        $esiEarned    = $employee->esi ?? 0;
 
         $grossSalary     = $grossBeforeDeductions + $overtimeAmount;
-        $totalDeductions = $lateDeduction + $pfEarned + $esiEarned;
+        $totalDeductions = $absentDeduction + $lateDeduction + $pfEarned + $esiEarned;
         $netSalary       = round($grossSalary - $totalDeductions, 2);
 
         return [
@@ -432,7 +430,7 @@ $absentDays           = max(0, $eligibleCalendarDays - $presentDays);
             'gross_salary'         => CurrencyHelper::paisaToRupee($grossSalary),
             'pf'                   => CurrencyHelper::paisaToRupee($pfEarned),
             'esi'                  => CurrencyHelper::paisaToRupee($esiEarned),
-            'absent_deduction'     => CurrencyHelper::paisaToRupee(0),   // N/A for daily workers
+            'absent_deduction'     => CurrencyHelper::paisaToRupee($absentDeduction),
             'late_deduction'       => CurrencyHelper::paisaToRupee($lateDeduction),
             'other_deductions'     => CurrencyHelper::paisaToRupee(0),
             'total_deductions'     => CurrencyHelper::paisaToRupee($totalDeductions),
@@ -443,7 +441,7 @@ $absentDays           = max(0, $eligibleCalendarDays - $presentDays);
             'proration_start_date' => $startDate,
             'proration_end_date'   => $endDate,
             'prorated_days'        => $eligibleCalendarDays,  // calendar days in eligible period
-            'proratio_multiplier'  => round($presentRatio, 4),
+            'proratio_multiplier'  => 1.0,
             '_daily_wage_rupee'    => CurrencyHelper::paisaToRupee($dailyWagePaisa),
             '_holiday_count'       => self::getHolidayDatesInRange($startDate, $endDate)->count(),
         ];

@@ -17,6 +17,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Components\Wizard;
 use Filament\Schemas\Schema;
+use App\Enums\PayoutType;
 
 class PayoutForm
 {
@@ -202,8 +203,8 @@ class PayoutForm
                                             if (!$employee) return 'Employee not found.';
 
                                             return $employee->payout_type === 'day_worker'
-                                                ? 'Daily worker: paid per day present. Holidays & Sundays are unpaid rest days.'
-                                                : 'Monthly worker: full salary minus absent deductions. Holidays & Sundays are paid rest days.';
+                                                ? 'Daily worker: full salary minus all absent days (including holidays/Sundays).'
+                                                : 'Monthly worker: full salary minus absent working days. Holidays & Sundays are paid rest days.';
                                         })
                                         ->columnSpanFull(),
 
@@ -282,19 +283,12 @@ class PayoutForm
                                             if (!$employeeId) return '';
                                             $employee = Employee::find($employeeId);
                                             return $employee?->payout_type === 'day_worker'
-                                                ? 'Daily worker: amounts = daily_wage × days present'
+                                                ? 'Daily worker: amounts match employee table, deductions applied below'
                                                 : 'Monthly worker: amounts are prorated if applicable';
                                         })
                                         ->schema([
                                             TextInput::make('basic_salary')
-                                                ->label(function (Get $get): string {
-                                                    $employeeId = $get('employee_id');
-                                                    if (!$employeeId) return 'Basic Salary';
-                                                    $employee = Employee::find($employeeId);
-                                                    return $employee?->payout_type === 'day_worker'
-                                                        ? 'Basic (Daily Wage × Present Days)'
-                                                        : 'Basic Salary';
-                                                })
+                                                ->label('Basic Salary')
                                                 ->numeric()->prefix('₹')->readOnly(),
                                             TextInput::make('hra')->label('HRA')->numeric()->prefix('₹')->readOnly(),
                                             TextInput::make('conveyance')->label('Conveyance')->numeric()->prefix('₹')->readOnly(),
@@ -314,7 +308,7 @@ class PayoutForm
                                             if (!$employeeId) return '';
                                             $employee = Employee::find($employeeId);
                                             return $employee?->payout_type === 'day_worker'
-                                                ? 'Daily worker: no absent deduction (unpaid days already excluded from earnings)'
+                                                ? 'Daily worker: absent deduction includes unpaid rest days'
                                                 : 'Monthly worker: PF & ESI are prorated if applicable';
                                         })
                                         ->schema([
@@ -328,7 +322,7 @@ class PayoutForm
                                                     if (!$employeeId) return '';
                                                     $employee = Employee::find($employeeId);
                                                     return $employee?->payout_type === 'day_worker'
-                                                        ? 'N/A — daily workers are not paid for absent days'
+                                                        ? 'Absent Days × (Monthly Salary ÷ calendar days) (Includes Sundays/Holidays)'
                                                         : 'absent_days × (monthly_salary ÷ calendar_days)';
                                                 }),
                                             TextInput::make('late_deduction')->label('Late Deduction')->numeric()->prefix('₹')->readOnly(),
@@ -366,7 +360,7 @@ class PayoutForm
                                         ->extraInputAttributes(['class' => 'text-2xl font-black text-primary-600 dark:text-primary-400']),
                                     Select::make('payout_type')
                                         ->label('Payment Mode')
-                                        ->options(['salaried' => 'Salaried (Monthly)', 'day_worker' => 'Day Worker (Daily)']),
+                                        ->options(PayoutType::class),
                                     DatePicker::make('paid_on')
                                         ->label('Paid On'),
                                 ]),
