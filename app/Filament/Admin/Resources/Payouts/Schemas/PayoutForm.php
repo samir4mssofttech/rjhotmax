@@ -359,9 +359,11 @@ class PayoutForm
                                         ->readOnly()
                                         ->extraInputAttributes(['class' => 'text-2xl font-black text-primary-600 dark:text-primary-400']),
                                     Select::make('payout_type')
+                                        ->required()
                                         ->label('Payment Mode')
                                         ->options(PayoutType::class),
                                     DatePicker::make('paid_on')
+                                        ->required()
                                         ->label('Paid On'),
                                 ]),
                             Textarea::make('remarks')

@@ -216,14 +216,10 @@ class PayoutCalculationTest extends TestCase
         Log::channel('single')->info("PAYOUT_TEST └ {$separator}");
     }
 
-    /**
-     * Create attendance records for an employee.
-     * $days = ['2026-05-01' => 'present', '2026-05-03' => 'absent', ...]
-     * status values: 'present', 'absent', 'half_day'
-     * Add 'late' => true or 'overtime' => 120 as extra keys per date via array value.
-     */
     private function makeAttendance(Employee $employee, array $days): void
     {
+        $user = \App\Models\User::first() ?? \App\Models\User::factory()->create();
+
         foreach ($days as $date => $status) {
             $isLate  = false;
             $overtime = 0;
@@ -242,6 +238,8 @@ class PayoutCalculationTest extends TestCase
 
             Attendance::factory()->create([
                 'employee_id' => $employee->id,
+                'branch_id'   => $employee->branch_id,
+                'entered_by'  => $user->id,
                 'date'        => $date,
                 'status'      => $attStatus,
                 'is_late'     => $isLate,
@@ -261,6 +259,27 @@ class PayoutCalculationTest extends TestCase
             'status'      => PayoutStatus::Paid,
             'paid_on'     => $paidOn,
             'payout_month' => substr($paidOn, 0, 7),
+            'total_working_days' => 30,
+            'present_days' => 30,
+            'absent_days' => 0,
+            'late_days' => 0,
+            'overtime_minutes' => 0,
+            'basic_salary' => 0,
+            'hra' => 0,
+            'conveyance' => 0,
+            'medical' => 0,
+            'other_allowances' => 0,
+            'overtime_amount' => 0,
+            'gross_salary' => 0,
+            'pf' => 0,
+            'esi' => 0,
+            'absent_deduction' => 0,
+            'late_deduction' => 0,
+            'other_deductions' => 0,
+            'total_deductions' => 0,
+            'net_salary' => 10000,
+            'payout_type' => $employee->payout_type,
+            'is_prorated' => false,
         ]);
     }
 
@@ -642,14 +661,15 @@ class PayoutCalculationTest extends TestCase
 
         $result = Payout::calculateForEmployee($this->dailyEmployee, $month);
 
-        // Expected: daily_basic = 3000000/31 paisa per day, present = 26 days (31 - 5 sundays)
+        // Expected: daily worker gets full basic components, but pays absent deductions for days not present.
         $sundays     = 5; // May 2026 has 5 Sundays: 3,10,17,24,31
         $presentDays = 31 - $sundays;
-        $dailyBasic  = (3_000_000 / 31 / 100);   // rupees per day
-        $dailyHra    = (500_000  / 31 / 100);
-        $dailyConv   = (200_000  / 31 / 100);
-        $dailyMed    = (100_000  / 31 / 100);
-        $expectedGross = round(($dailyBasic + $dailyHra + $dailyConv + $dailyMed) * $presentDays, 2);
+        $absentDays  = $sundays; // Sundays are unpaid absences for daily workers
+        
+        $expectedGross = (3_000_000 + 500_000 + 200_000 + 100_000) / 100;
+        
+        $dailyWage = $expectedGross / 31;
+        $expectedAbsentDeduction = round($dailyWage * $absentDays, 2);
 
         $this->logPayoutTest(
             'TC-D01 | Daily | Full month present (all non-Sunday)',
@@ -659,14 +679,15 @@ class PayoutCalculationTest extends TestCase
             $result,
             [
                 'present_days_expected' => $presentDays,
-                'daily_basic_rupee'     => round($dailyBasic, 4),
                 'expected_gross'        => $expectedGross,
+                'expected_absent_deduction' => $expectedAbsentDeduction,
             ]
         );
 
         $this->assertArrayNotHasKey('error', $result);
         $this->assertEquals($presentDays, $result['present_days']);
         $this->assertEqualsWithDelta($expectedGross, $result['gross_salary'], 1.0);
+        $this->assertEqualsWithDelta($expectedAbsentDeduction, $result['absent_deduction'], 1.0);
     }
 
     // ── TC-D02 ─────────────────────────────────────────────────────
@@ -714,6 +735,8 @@ class PayoutCalculationTest extends TestCase
         // Also add a record before joining — should NOT be counted
         Attendance::factory()->create([
             'employee_id' => $this->dailyEmployee->id,
+            'branch_id'   => $this->dailyEmployee->branch_id,
+            'entered_by'  => \App\Models\User::first()->id ?? \App\Models\User::factory()->create()->id,
             'date'        => '2026-05-10',
             'status'      => \App\Enums\Attendance::PRESENT,
         ]);
